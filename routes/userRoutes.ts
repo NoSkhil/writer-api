@@ -5,4 +5,4 @@ const userRoutes = Router();
 
 export default userRoutes;
 
-userRoutes.get('/read', userController.getAllUserData );
+userRoutes.post('/data', userController.getUser );

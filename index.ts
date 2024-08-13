@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 import cors from 'cors';
 import db from './prisma/client';
-import type { users } from '@prisma/client'
 
 const app = express();
 

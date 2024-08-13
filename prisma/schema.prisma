@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model users {
+model user {
   user_id             String    @id @unique @default(cuid())
   first_name          String
   last_name           String
@@ -16,27 +16,42 @@ model users {
   profile_picture_url String?
   created_date        DateTime  @default(now())
   last_updated_date   DateTime  @default(now()) @updatedAt
-  threads             threads[]
+  thread              thread[]
+  message             message[]
 }
 
-model threads {
-  thread_id    String     @id @unique
-  created_date DateTime   @default(now())
-  user_id      users      @relation(fields: [usersUser_id], references: [user_id])
-  message_ids  messages[]
-  usersUser_id String
+model thread {
+  thread_id    String    @id @unique
+  created_date DateTime  @default(now())
+  message_ids  message[]
+  user_id      user      @relation(fields: [userUser_id], references: [user_id])
+  userUser_id  String
 }
 
-model messages {
-  message_id       String   @id @unique
-  role             role
-  content          String
-  created_date     DateTime @default(now())
-  thread_id        threads  @relation(fields: [threadsThread_id], references: [thread_id])
-  threadsThread_id String
+model message {
+  message_id      String   @id @unique
+  role            role
+  content         String
+  created_date    DateTime @default(now())
+  thread_id       thread   @relation(fields: [threadThread_id], references: [thread_id])
+  user_id         user     @relation(fields: [userUser_id], references: [user_id])
+  threadThread_id String
+  userUser_id     String
+}
+
+model logs {
+  id      String   @id @unique @default(cuid())
+  type    log_type
+  content Json
 }
 
 enum role {
   user
   assistant
+}
+
+enum log_type {
+  error
+  user_action
+  account_creation
 }
