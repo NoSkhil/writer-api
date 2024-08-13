@@ -10,13 +10,12 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req:Request,res:Response)=> res.status(200).send({data:"voxtone server."}));
-
+app.get('/thread');
 
 
 
 const PORT = process.env.PORT || 3000;
 app.listen(8000, async ()=>{
 console.log(`Voxtone server running at port - ${PORT}`);
-console.log(db);
 });
 

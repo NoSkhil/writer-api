@@ -6,7 +6,6 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
 model user {
   user_id             String    @id @unique @default(cuid())
   first_name          String
@@ -15,7 +14,7 @@ model user {
   phone_number        BigInt
   profile_picture_url String?
   created_date        DateTime  @default(now())
-  last_updated_date   DateTime  @default(now()) @updatedAt
+  updated_date        DateTime  @default(now()) @updatedAt
   thread              thread[]
   message             message[]
 }
@@ -25,13 +24,14 @@ model thread {
   created_date DateTime  @default(now())
   message_ids  message[]
   user_id      user      @relation(fields: [userUser_id], references: [user_id])
+  updated_date DateTime  @default(now()) @updatedAt
   userUser_id  String
 }
 
 model message {
   message_id      String   @id @unique
   role            role
-  content         String
+  content         Json
   created_date    DateTime @default(now())
   thread_id       thread   @relation(fields: [threadThread_id], references: [thread_id])
   user_id         user     @relation(fields: [userUser_id], references: [user_id])
@@ -40,9 +40,28 @@ model message {
 }
 
 model logs {
-  id      String   @id @unique @default(cuid())
-  type    log_type
-  content Json
+  id           String   @id @unique @default(cuid())
+  type         log_type
+  content      Json
+  created_date DateTime @default(now())
+}
+
+model temp_thread {
+  temp_thread_id   String         @id @unique
+  created_date     DateTime       @default(now())
+  updated_date     DateTime       @default(now()) @updatedAt
+  temp_message_ids temp_message[]
+  temp_user_id     String
+}
+
+model temp_message {
+  temp_message_id           String      @id @unique
+  role                      role
+  content                   Json
+  created_date              DateTime    @default(now())
+  temp_thread_id            temp_thread @relation(fields: [temp_threadTemp_thread_id], references: [temp_thread_id])
+  temp_user_id              String
+  temp_threadTemp_thread_id String
 }
 
 enum role {
