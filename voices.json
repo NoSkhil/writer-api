@@ -1,0 +1,137 @@
+{
+  "en-AU-NatashaNeural": {
+    "description": "Australian English, female voice. A clear-sounding voice with great versatility that can adapt to any use case and speak in a way that's easy to understand."
+  },
+  "en-AU-WilliamNeural": {
+    "description": "Australian English, male voice."
+  },
+  "en-CA-ClaraNeural": {
+    "description": "Canadian English, female voice. A clear-sounding voice with great versatility that can adapt to any use case and speak in a way that's easy to understand."
+  },
+  "en-CA-LiamNeural": {
+    "description": "Canadian English, male voice."
+  },
+  "en-GB-LibbyNeural": {
+    "description": "British English, female voice with a young, lively tone. A clear-sounding voice with great versatility that can adapt to any use case and speak in a way that's easy to understand."
+  },
+  "en-GB-MaisieNeural": {
+    "description": "British English, female voice. A child voice that's great at conveying curiosity."
+  },
+  "en-GB-RyanNeural": {
+    "description": "British English, male voice."
+  },
+  "en-HK-SamNeural": {
+    "description": "Hong Kong English, male voice."
+  },
+  "en-HK-YanNeural": {
+    "description": "Hong Kong English, female voice."
+  },
+  "en-IE-ConnorNeural": {
+    "description": "Irish English, male voice. A friendly voice with slightly whimsical undertones but with a wide expressive range."
+  },
+  "en-IE-EmilyNeural": {
+    "description": "Irish English, female voice."
+  },
+  "en-IN-NeerjaNeural": {
+    "description": "Indian English, female voice."
+  },
+  "en-IN-PrabhatNeural": {
+    "description": "Indian English, male voice."
+  },
+  "en-KE-AsiliaNeural": {
+    "description": "Kenyan English, female voice."
+  },
+  "en-KE-ChilembaNeural": {
+    "description": "Kenyan English, male voice."
+  },
+  "en-NG-AbeoNeural": {
+    "description": "Nigerian English, male voice."
+  },
+  "en-NG-EzinneNeural": {
+    "description": "Nigerian English, female voice."
+  },
+  "en-NZ-MitchellNeural": {
+    "description": "New Zealand English, male voice."
+  },
+  "en-NZ-MollyNeural": {
+    "description": "New Zealand English, female voice."
+  },
+  "en-PH-JamesNeural": {
+    "description": "Philippine English, male voice."
+  },
+  "en-PH-RosaNeural": {
+    "description": "Philippine English, female voice."
+  },
+  "en-SG-LunaNeural": {
+    "description": "Singapore English, female voice."
+  },
+  "en-SG-WayneNeural": {
+    "description": "Singapore English, male voice."
+  },
+  "en-TZ-ElimuNeural": {
+    "description": "Tanzanian English, male voice."
+  },
+  "en-TZ-ImaniNeural": {
+    "description": "Tanzanian English, female voice."
+  },
+  "en-US-AmberNeural": {
+    "description": "American English, female voice. An engaging voice for children's stories that's warm and approachable, perfect for capturing the attention of young listeners."
+  },
+  "en-US-AnaNeural": {
+    "description": "American English, female voice. A child voice that's great at conveying curiosity and engaging users with a fun and playful tone that's sure to delight."
+  },
+  "en-US-AriaNeural": {
+    "description": "American English, female voice with a calm, soothing tone. A clear-sounding voice with great versatility that can adapt to any use case and speak in a way that's easy to understand."
+  },
+  "en-US-AshleyNeural": {
+    "description": "American English, female voice. A young voice that sounds a little shy but honest and sincere, conveying a sense of authenticity and approachability."
+  },
+  "en-US-BrandonNeural": {
+    "description": "American English, male voice. An honest and soft-spoken voice that's warm and good for conversation, connecting with users on a personal level and building trust."
+  },
+  "en-US-ChristopherNeural": {
+    "description": "American English, male voice. A warm voice for imparting information, especially for conversation, great for conveying information in a fun and approachable way."
+  },
+  "en-US-CoraNeural": {
+    "description": "American English, female voice. A softer voice with a touch of melancholy that conveys understanding and empathy, delivering content in a sensitive and compassionate way."
+  },
+  "en-US-ElizabethNeural": {
+    "description": "American English, female voice. A professorial voice that's clear and authoritative, great for delivering educational content in a way that's easy to understand."
+  },
+  "en-US-EricNeural": {
+    "description": "American English, male voice. A friendly voice that conveys soft-spoken confidence, inspiring trust and reliability with a calm and collected tone."
+  },
+  "en-US-GuyNeural": {
+    "description": "American English, male voice with a deep, authoritative tone. A friendly voice with slightly whimsical undertones and a wide expressive range that can convey any emotion with ease."
+  },
+  "en-US-JacobNeural": {
+    "description": "American English, male voice. A mature voice that conveys a strong sense of believability, delivering content in a way that's straightforward and to the point."
+  },
+  "en-US-JennyNeural": {
+    "description": "American English, female voice. A youthful voice with a wide range of expressions, perfect for customer service and keeping users satisfied."
+  },
+  "en-US-MichelleNeural": {
+    "description": "American English, female voice. An honest voice that conveys confidence and understanding."
+  },
+  "en-US-MonicaNeural": {
+    "description": "American English, female voice. A mature voice that conveys a strong sense of believability, perfect for delivering content in the best possible way."
+  },
+  "en-US-RogerNeural": {
+    "description": "American English, male voice. A friendly voice that conveys information in an approachable manner."
+  },
+  "en-US-SaraNeural": {
+    "description": "American English, female voice. A female teenager voice with a wide range of expressive capabilities that can convey any emotion with ease and keep users engaged."
+  },
+  "en-US-SteffanNeural": {
+    "description": "American English, male voice. A great voice for imparting information, especially in a learning environment."
+  },
+  "en-US-TonyNeural": {
+    "description": "American English, male voice. A versatile voice that can sound both casual and professional, adaptable to any use case and situation."
+  },
+  "en-ZA-LeahNeural": {
+    "description": "South African English, female voice."
+  },
+  "en-ZA-LukeNeural": {
+    "description": "South African English, male voice."
+  }
+}
