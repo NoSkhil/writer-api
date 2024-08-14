@@ -3,12 +3,12 @@ import {type temp_threads as ITempThread, Prisma} from '@prisma/client';
 
 type ICreateTempThread = Prisma.temp_threadsCreateInput;
 
-const getThread = async(id:string) : Promise<ITempThread | null> => {
+const getThread = async(id:string) : Promise<Record<"data",ITempThread> | Record<"err",string> > => {
     try {
         const thread = await db.temp_threads.findFirst(id);
-        if (!thread) return null;
+        if (!thread) return {err:"Invalid Temp Thread ID."};
 
-        else return thread;
+        else return {data:thread};
     }
     catch(err) {
         console.log(err);
@@ -16,12 +16,10 @@ const getThread = async(id:string) : Promise<ITempThread | null> => {
     }
 };
 
-const createThread = async(threadData:ICreateTempThread) : Promise<ITempThread | null> => {
+const createThread = async(threadData:ICreateTempThread) : Promise<Record<"data",ITempThread> > => {
     try {
         const createThread = await db.temp_threads.create({data:threadData});
-        if (!createThread) return null;
-
-        else return createThread;
+        return {data:createThread};
     }
     catch(err) {
         console.log(err);

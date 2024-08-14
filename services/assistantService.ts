@@ -1,6 +1,3 @@
-import db from '../prisma/client';
-import { Prisma } from '@prisma/client';
-import { type threads as IThread } from '@prisma/client';
 import OpenAI from "openai";
 
 const openai = new OpenAI();
@@ -8,12 +5,12 @@ const openai = new OpenAI();
 type IAssistantThread = OpenAI.Beta.Threads.Thread;
 type ICreateAssistantThread = OpenAI.Beta.Threads.ThreadCreateParams;
 
-const getAssistantThread = async(id: string): Promise<IAssistantThread | null> => {
+const getAssistantThread = async(id: string): Promise<Record<"data",IAssistantThread> | Record<"err",string>> => {
     try {
         const thread = await openai.beta.threads.retrieve(id);        
-        if (!thread) return null;
+        if (!thread) return {err:"Invalid Assistant Thread ID."};
         
-        return thread;
+        return {data:thread};
     }
     catch(err) {
         console.log(err);
