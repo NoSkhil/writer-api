@@ -21,46 +21,46 @@ model users {
 }
 
 model threads {
-  id           String     @id @unique @default(cuid())
+  id           String     @id @unique
   created_date DateTime   @default(now())
-  user         users      @relation(fields: [usersId], references: [id])
-  usersId      String
+  user         users      @relation(fields: [user_id], references: [id])
+  user_id      String
   messages     messages[]
 }
 
 model messages {
-  id           String   @id @unique @default(cuid())
+  id           String   @id @unique
   created_date DateTime @default(now())
   role         role
   content      Json
-  thread       threads  @relation(fields: [threadsId], references: [id])
-  user         users    @relation(fields: [usersId], references: [id])
-  threadsId    String
-  usersId      String
+  thread       threads  @relation(fields: [thread_id], references: [id])
+  user         users    @relation(fields: [user_id], references: [id])
+  thread_id    String
+  user_id      String
 }
 
 model logs {
-  id           String   @id @unique @default(cuid())
+  id           String   @id @unique
   type         log_type
   content      Json
   created_date DateTime @default(now())
 }
 
 model temp_threads {
-  id            String          @id @unique @default(cuid())
+  id            String          @id @unique
   created_date  DateTime        @default(now())
   temp_user     String
   temp_messages temp_messages[]
 }
 
 model temp_messages {
-  id             String       @id @unique @default(cuid())
+  id             String       @id @unique
   role           role
   content        Json
   created_date   DateTime     @default(now())
-  temp_thread    temp_threads @relation(fields: [temp_threadsId], references: [id])
+  temp_thread    temp_threads @relation(fields: [temp_thread_id], references: [id])
   temp_user      String
-  temp_threadsId String
+  temp_thread_id String
 }
 
 enum role {

@@ -13,6 +13,8 @@ const getUser = async(id:string) : Promise<IUser|null> => {
     }
 };
 
+
+
 export default {
     getUser
 };
