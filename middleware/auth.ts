@@ -33,13 +33,13 @@ export default async function handler(
 
     const user = await userService.getUser(decoded.id);
 
-    if (!user) {
+    if ("err" in user) {
       console.log('Invalid credentials');
       res.status(401);
       throw new Error('Invalid credentials');
     }
 
-    req.user = user;
+    req.user = user.data;
     next();
   } catch (err) {
     console.log(err);

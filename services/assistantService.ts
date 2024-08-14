@@ -31,13 +31,25 @@ const createAssistantThread = async(messageData: ICreateAssistantThread): Promis
     }
 };
 
+const getAssistantMessage = async(threadId: string, messageId: string): Promise<Record<"data",IAssistantMessage> | Record<"err",string>> => {
+    try {
+        const thread = await openai.beta.threads.messages.retrieve(threadId,messageId);        
+        if (!thread) return {err:"Invalid Assistant Thread ID."};
+        
+        return {data:thread};
+    }
+    catch(err) {
+        console.log(err);
+        throw err;
+    }
+};
+
 const createAssistantMessage = async(threadId:string, messageData: ICreateAssistantMessage): Promise<Record<"data",IAssistantMessage> | Record<"err",string>> => {
     try {
-        const threadData = await getAssistantThread(threadId);
-        if ("err" in threadData) return {err:"Invalid Assistant Thread ID."};  
-        const {data:thread} = threadData;
+        const thread = await getAssistantThread(threadId);
+        if ("err" in thread) return {err:"Invalid Assistant Thread ID."};  
 
-        const createMessage = await openai.beta.threads.messages.create(thread.id,messageData);
+        const createMessage = await openai.beta.threads.messages.create(thread.data.id,messageData);
         return {data:createMessage};
     }
     catch(err) {
