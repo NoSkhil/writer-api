@@ -1,4 +1,4 @@
-import type {user as IUser} from '@prisma/client';
+import type {users as IUser} from '@prisma/client';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import userService from '../services/userService';
@@ -29,9 +29,9 @@ export default async function handler(
     const decoded = jwt.verify(
       token,
       process.env.JWT_SECRET as string
-    ) as JwtPayload & { _id: string };
+    ) as JwtPayload;
 
-    const user = await userService.getUser(decoded.user_id);
+    const user = await userService.getUser(decoded.id);
 
     if (!user) {
       console.log('Invalid credentials');

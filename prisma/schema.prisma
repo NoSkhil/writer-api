@@ -6,37 +6,37 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-model user {
-  user_id             String    @id @unique @default(cuid())
+
+model users {
+  id                  String     @id @unique @default(cuid())
   first_name          String
   last_name           String
   email               String
-  phone_number        BigInt
+  phone_number        BigInt?
   profile_picture_url String?
-  created_date        DateTime  @default(now())
-  updated_date        DateTime  @default(now()) @updatedAt
-  thread              thread[]
-  message             message[]
+  created_date        DateTime   @default(now())
+  updated_date        DateTime   @default(now()) @updatedAt
+  threads             threads[]
+  messages            messages[]
 }
 
-model thread {
-  thread_id    String    @id @unique
-  created_date DateTime  @default(now())
-  message_ids  message[]
-  user_id      user      @relation(fields: [userUser_id], references: [user_id])
-  updated_date DateTime  @default(now()) @updatedAt
-  userUser_id  String
+model threads {
+  id           String     @id @unique @default(cuid())
+  created_date DateTime   @default(now())
+  user         users      @relation(fields: [usersId], references: [id])
+  usersId      String
+  messages     messages[]
 }
 
-model message {
-  message_id      String   @id @unique
-  role            role
-  content         Json
-  created_date    DateTime @default(now())
-  thread_id       thread   @relation(fields: [threadThread_id], references: [thread_id])
-  user_id         user     @relation(fields: [userUser_id], references: [user_id])
-  threadThread_id String
-  userUser_id     String
+model messages {
+  id           String   @id @unique @default(cuid())
+  created_date DateTime @default(now())
+  role         role
+  content      Json
+  thread       threads  @relation(fields: [threadsId], references: [id])
+  user         users    @relation(fields: [usersId], references: [id])
+  threadsId    String
+  usersId      String
 }
 
 model logs {
@@ -46,22 +46,21 @@ model logs {
   created_date DateTime @default(now())
 }
 
-model temp_thread {
-  temp_thread_id   String         @id @unique
-  created_date     DateTime       @default(now())
-  updated_date     DateTime       @default(now()) @updatedAt
-  temp_message_ids temp_message[]
-  temp_user_id     String
+model temp_threads {
+  id            String          @id @unique @default(cuid())
+  created_date  DateTime        @default(now())
+  temp_user     String
+  temp_messages temp_messages[]
 }
 
-model temp_message {
-  temp_message_id           String      @id @unique
-  role                      role
-  content                   Json
-  created_date              DateTime    @default(now())
-  temp_thread_id            temp_thread @relation(fields: [temp_threadTemp_thread_id], references: [temp_thread_id])
-  temp_user_id              String
-  temp_threadTemp_thread_id String
+model temp_messages {
+  id             String       @id @unique @default(cuid())
+  role           role
+  content        Json
+  created_date   DateTime     @default(now())
+  temp_thread    temp_threads @relation(fields: [temp_threadsId], references: [id])
+  temp_user      String
+  temp_threadsId String
 }
 
 enum role {
