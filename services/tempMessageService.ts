@@ -4,30 +4,28 @@ import { temp_messages as ITempMessage } from '@prisma/client';
 
 type ICreateTempMessage = Prisma.temp_messagesUncheckedCreateInput;
 
-const getMessage = async(id: string): Promise<ITempMessage | Error> => {
+const getMessage = async(id: string): Promise<ITempMessage | null> => {
     try {
-        const message = await db.temp_messages.findUnique({ where: { id } });
-        if (!message) throw new Error(`Failed to get message!`);
-        
+        const message = await db.temp_messages.findUnique({ where: { id } }); 
         return message;
     }
     catch(err) {
         console.log(err);
-        return err as Error;
+        throw err;
     }
 };
 
-const createMessage = async(messageData: ICreateTempMessage): Promise<ITempMessage | Error> => {
+const createMessage = async(messageData: ICreateTempMessage): Promise<ITempMessage | null > => {
     try {
         const thread = await db.temp_threads.findUnique({ where: { id: messageData.temp_thread_id } });
-        if (!thread) throw new Error("Thread does not exist");
+        if (!thread) return null;
         
         const createdMessage = await db.temp_messages.create({ data: messageData });
         return createdMessage;
     }
     catch(err) {
         console.log(err);
-        return err;
+        throw err;
     }
 };
 
