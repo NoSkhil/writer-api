@@ -54,12 +54,12 @@ const createAssistantMessage = async (threadId: string, messageData: ICreateAssi
     }
 }
 
-const fetchAssistantResponse = async (threadId:string) : Promise<Record<"data",IAssistantMessage>> => {
+const fetchAssistantResponse = async (threadId: string): Promise<Record<"data", IAssistantMessage>> => {
     try {
-        const response = await openai.beta.threads.messages.list(threadId,{limit:1});
-        return {data:response.data[0]};
+        const response = await openai.beta.threads.messages.list(threadId, { limit: 1 });
+        return { data: response.data[0] };
     }
-    catch(err) {
+    catch (err) {
         console.log(err);
         throw err;
     }
@@ -69,7 +69,7 @@ const fetchAssistantResponse = async (threadId:string) : Promise<Record<"data",I
 const runAssistant = async (threadId: string): Promise<Record<"data", IAssistantRunData>> => {
     try {
         const run = await openai.beta.threads.runs.create(threadId, { assistant_id: process.env.OPENAI_ASSISTANT_ID as string });
-        return {data:run};
+        return { data: run };
     }
     catch (err) {
         console.log(err);
