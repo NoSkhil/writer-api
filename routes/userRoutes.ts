@@ -3,6 +3,6 @@ import userController from '../controllers/userController';
 
 const userRoutes = Router();
 
-export default userRoutes;
-
 userRoutes.post('/data', userController.getUser );
+
+export default userRoutes;
