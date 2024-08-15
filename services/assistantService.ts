@@ -3,7 +3,9 @@ import OpenAI from "openai";
 import tempMessageService from "./tempMessageService";
 import messageService from "./messageService";
 
-const openai = new OpenAI({apiKey:process.env.OPENAI_API_KEY as string});
+const openai = new OpenAI({
+    apiKey:process.env.OPENAI_API_KEY as string
+});
 
 type IAssistantThread = OpenAI.Beta.Threads.Thread;
 type ICreateAssistantThread = OpenAI.Beta.Threads.ThreadCreateParams;
