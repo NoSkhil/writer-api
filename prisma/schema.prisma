@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["omitApi"]
 }
 
 datasource db {
@@ -11,8 +12,9 @@ model users {
   id                  String     @id @unique @default(cuid())
   first_name          String
   last_name           String
+  password            String
   email               String
-  phone_number        BigInt?
+  phone_number        String
   profile_picture_url String?
   created_date        DateTime   @default(now())
   updated_date        DateTime   @default(now()) @updatedAt
