@@ -2,18 +2,19 @@ import { Prisma, type temp_messages as ITempMessage, type messages as IMessage }
 import OpenAI from "openai";
 import tempMessageService from "./tempMessageService";
 import messageService from "./messageService";
+import tempThreadService from "./tempThreadService";
+import threadService from "./threadService";
 
 const openai = new OpenAI({
-    apiKey:process.env.OPENAI_API_KEY as string
+    apiKey: process.env.OPENAI_API_KEY as string
 });
 
 type IAssistantThread = OpenAI.Beta.Threads.Thread;
 type ICreateAssistantThread = OpenAI.Beta.Threads.ThreadCreateParams;
 type ICreateAssistantMessage = OpenAI.Beta.Threads.MessageCreateParams;
 type IAssistantMessage = OpenAI.Beta.Threads.Message;
-type IAssistantRunData = OpenAI.Beta.Threads.Run;
-type ITempMessageCreate = Prisma.temp_messagesUncheckedCreateInput;
-type IMessageCreate = Prisma.messagesUncheckedCreateInput;
+type ICreateMessage = Prisma.messagesUncheckedCreateInput;
+type ICreateTempMessage = Prisma.temp_messagesUncheckedCreateInput;
 
 const getAssistantThread = async (id: string): Promise<Record<"data", IAssistantThread> | Record<"err", string>> => {
     try {
@@ -72,38 +73,26 @@ const fetchLatestMessage = async (threadId: string): Promise<Record<"data", IAss
     }
 }
 
-const saveTempAssistantMessage = async (messageData:ITempMessageCreate) : Promise <Record<"data",ITempMessage>| Record<"err",string>> => {
-    try {
-        const saveMessage = await tempMessageService.createMessage(messageData);
-        if ("err" in saveMessage) return {err:saveMessage.err};
-
-        return {data:saveMessage.data};
-    }
-    catch (err) {
-        console.log(err);
-        throw err;
-    }
-}
-
-const saveAssistantMessage = async (messageData:IMessageCreate) : Promise <Record<"data",IMessage>| Record<"err",string>> => {
-    try {
-        const saveMessage = await messageService.createMessage(messageData);
-        if ("err" in saveMessage) return {err:saveMessage.err};
-
-        return {data:saveMessage.data};
-    }
-    catch (err) {
-        console.log(err);
-        throw err;
-    }
-}
-
-const runAssistant = async (threadId: string): Promise<Record<"data", IAssistantRunData>> => {
+const runAssistant = async (threadId: string, userId: string): Promise<Record<"data", IMessage> | Record<"err", string>> => {
     try {
         const run = await openai.beta.threads.runs.create(threadId, { assistant_id: process.env.OPENAI_ASSISTANT_ID as string });
-        //fetch latest message in thread
-        //save assistant response to messages or temp_messages
-        return { data: run };
+        const assistantResponse = await fetchLatestMessage(run.thread_id);
+        if ("err" in assistantResponse) return { err: "Failed to fetch assistant response" };
+
+        if (assistantResponse.data.content[0].type !== "text") return { err: "Invalid Assistant response!" };
+
+        const responseContent = assistantResponse.data.content[0].text.value;
+        const messageData: ICreateMessage = {
+            user_id: userId,
+            id: assistantResponse.data.id,
+            role: assistantResponse.data.role,
+            content: { responseContent },
+            thread_id: run.thread_id
+        }
+        const savedResponse = await messageService.saveAssistantResponse(messageData);
+        if ("err" in savedResponse) return { err: "Failed to save assistant response!" };
+
+        return { data: savedResponse.data };
     }
     catch (err) {
         console.log(err);
@@ -111,14 +100,39 @@ const runAssistant = async (threadId: string): Promise<Record<"data", IAssistant
     }
 }
 
+const runTempAssistant = async (threadId: string, tempUserId: string): Promise<Record<"data", ITempMessage> | Record<"err", string>> => {
+    try {
+        const run = await openai.beta.threads.runs.create(threadId, { assistant_id: process.env.OPENAI_ASSISTANT_ID as string });
+        const assistantResponse = await fetchLatestMessage(run.thread_id);
+        if ("err" in assistantResponse) return { err: "Failed to fetch assistant response" };
+
+        if (assistantResponse.data.content[0].type !== "text") return { err: "Invalid Assistant response!" };
+
+        const responseContent = assistantResponse.data.content[0].text.value;
+        const messageData: ICreateTempMessage = {
+            temp_user: tempUserId,
+            id: assistantResponse.data.id,
+            role: assistantResponse.data.role,
+            content: { responseContent },
+            temp_thread_id: run.thread_id
+        }
+        const savedResponse = await tempMessageService.saveTempAssistantResponse(messageData);
+        if ("err" in savedResponse) return { err: "Failed to save assistant response!" };
+
+        return { data: savedResponse.data };
+    }
+    catch (err) {
+        console.log(err);
+        throw err;
+    }
+}
 
 export default {
     getAssistantThread,
     createAssistantThread,
     createAssistantMessage,
     getAssistantMessage,
-    runAssistant,
     fetchLatestMessage,
-    saveAssistantMessage,
-    saveTempAssistantMessage
+    runAssistant,
+    runTempAssistant,
 };
