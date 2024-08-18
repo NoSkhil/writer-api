@@ -2,15 +2,12 @@ import { Prisma, type temp_messages as ITempMessage, type messages as IMessage }
 import OpenAI from "openai";
 import tempMessageService from "./tempMessageService";
 import messageService from "./messageService";
-import tempThreadService from "./tempThreadService";
-import threadService from "./threadService";
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY as string
 });
 
 type IAssistantThread = OpenAI.Beta.Threads.Thread;
-type ICreateAssistantThread = OpenAI.Beta.Threads.ThreadCreateParams;
 type ICreateAssistantMessage = OpenAI.Beta.Threads.MessageCreateParams;
 type IAssistantMessage = OpenAI.Beta.Threads.Message;
 type ICreateMessage = Prisma.messagesUncheckedCreateInput;
@@ -51,9 +48,10 @@ const getAssistantMessage = async (threadId: string, messageId: string): Promise
     }
 };
 
-const createAssistantMessage = async (
-    { threadId, messageData }: { threadId: string; messageData: ICreateAssistantMessage }
-  ): Promise<Record<"data", IAssistantMessage>> => {
+const createAssistantMessage = async ({ threadId, messageData }: {
+    threadId: string;
+    messageData: ICreateAssistantMessage
+}): Promise<Record<"data", IAssistantMessage>> => {
     try {
         const createMessage = await openai.beta.threads.messages.create(threadId, messageData);
         return { data: createMessage };
@@ -75,7 +73,10 @@ const fetchLatestMessage = async (threadId: string): Promise<Record<"data", IAss
     }
 }
 
-const runAssistant = async (threadId: string, userId: string): Promise<Record<"data", IMessage> | Record<"err", string>> => {
+const runAssistant = async ({ threadId, userId }: {
+    threadId: string;
+    userId: string;
+}): Promise<Record<"data", IMessage> | Record<"err", string>> => {
     try {
         const run = await openai.beta.threads.runs.create(threadId, { assistant_id: process.env.OPENAI_ASSISTANT_ID as string });
         const assistantResponse = await fetchLatestMessage(run.thread_id);
@@ -102,13 +103,10 @@ const runAssistant = async (threadId: string, userId: string): Promise<Record<"d
     }
 }
 
-const runTempAssistant = async ({threadId,tempUserId}:{
-    threadId:string;
-    tempUserId:string;
-}): Promise<
-Record<"data", ITempMessage> | 
-Record<"err", string>
-> => {
+const runTempAssistant = async ({ threadId, tempUserId }: {
+    threadId: string;
+    tempUserId: string;
+}): Promise<Record<"data", ITempMessage> | Record<"err", string>> => {
     try {
         const run = await openai.beta.threads.runs.create(threadId, { assistant_id: process.env.OPENAI_ASSISTANT_ID as string });
         const assistantResponse = await fetchLatestMessage(run.thread_id);

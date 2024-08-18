@@ -28,16 +28,16 @@ const initialiseChat = async (req: CustomRequest, res: Response) => {
 const createMessage = async (req: CustomRequest, res: Response) => {
     try {
 
-        const {threadId,content} = req.body;
+        const { threadId, content } = req.body;
 
         if (req.user) {
 
         }
         else if (req.session.tempUserId) {
-            const thread = await chatService.createTempMessage({threadId,content,userId:req.session.tempUserId});
-            if ("err" in thread) res.status(400).send(thread.err);
-            
-            else res.status(200).send(thread.data);
+            const messages = await chatService.createTempMessage({ threadId, content, userId: req.session.tempUserId });
+            if ("err" in messages) res.status(400).send(messages.err);
+
+            else res.status(200).send(messages.data);
         }
 
         res.status(400).send({ err: "Invalid request" });
@@ -48,7 +48,7 @@ const createMessage = async (req: CustomRequest, res: Response) => {
     }
 };
 
-export default { 
+export default {
     initialiseChat,
     createMessage
 };

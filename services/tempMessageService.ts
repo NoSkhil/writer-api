@@ -17,12 +17,12 @@ const getTempMessage = async (id: string): Promise<Record<"data", ITempMessage> 
     }
 };
 
-const saveTempAssistantResponse = async (messageData:ICreateTempMessage) : Promise <Record<"data",ITempMessage>| Record<"err",string>> => {
+const saveTempAssistantResponse = async (messageData: ICreateTempMessage): Promise<Record<"data", ITempMessage> | Record<"err", string>> => {
     try {
         const saveMessage = await createTempMessage(messageData);
-        if ("err" in saveMessage) return {err:saveMessage.err};
+        if ("err" in saveMessage) return { err: saveMessage.err };
 
-        return {data:saveMessage.data};
+        return { data: saveMessage.data };
     }
     catch (err) {
         console.log(err);
