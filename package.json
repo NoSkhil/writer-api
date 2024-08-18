@@ -4,7 +4,7 @@
   "description": "voxtone-ai-services",
   "main": "index.js",
   "scripts": {
-    "test": "dev"
+    "test": "ts-node index.ts"
   },
   "author": "",
   "license": "ISC",

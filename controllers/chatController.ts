@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
 import { CustomRequest } from '../types/requestTypes';
 import chatService from "../services/chatService";
-import { Prisma } from "@prisma/client";
-
-type ICreateTempMessage = Prisma.temp_messagesUncheckedCreateInput;
 
 const initialiseChat = async (req: CustomRequest, res: Response) => {
     try {
@@ -27,7 +24,6 @@ const initialiseChat = async (req: CustomRequest, res: Response) => {
 
 const createMessage = async (req: CustomRequest, res: Response) => {
     try {
-
         const { threadId, content } = req.body;
 
         if (req.user) {
