@@ -1,7 +1,54 @@
-import {Request, Response} from "express";
+import { Request, Response } from "express";
+import { CustomRequest } from '../types/requestTypes';
+import chatService from "../services/chatService";
+import { Prisma } from "@prisma/client";
 
-const initialiseChat = async (req:Request,res:Response) => {
+type ICreateTempMessage = Prisma.temp_messagesUncheckedCreateInput;
 
+const initialiseChat = async (req: CustomRequest, res: Response) => {
+    try {
+        if (req.user) {
+
+        }
+        else if (req.session.tempUserId) {
+            const thread = await chatService.initialiseTempChat(req.session.tempUserId);
+            if ("err" in thread) res.status(400).send(thread.err);
+
+            else res.status(200).send(thread.data);
+        }
+
+        res.status(400).send({ err: "Invalid request" });
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).send({ err: "Internal server error!" });
+    }
 };
 
-export default {initialiseChat};
+const createMessage = async (req: CustomRequest, res: Response) => {
+    try {
+
+        const {threadId,content} = req.body;
+
+        if (req.user) {
+
+        }
+        else if (req.session.tempUserId) {
+            const thread = await chatService.createTempMessage({threadId,content,userId:req.session.tempUserId});
+            if ("err" in thread) res.status(400).send(thread.err);
+            
+            else res.status(200).send(thread.data);
+        }
+
+        res.status(400).send({ err: "Invalid request" });
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).send({ err: "Internal server error!" });
+    }
+};
+
+export default { 
+    initialiseChat,
+    createMessage
+};
