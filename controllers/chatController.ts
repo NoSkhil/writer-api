@@ -13,8 +13,6 @@ const initialiseChat = async (req: CustomRequest, res: Response) => {
 
             else res.status(200).send(thread.data);
         }
-
-        res.status(400).send({ err: "Invalid request" });
     }
     catch (err) {
         console.log(err);
@@ -35,8 +33,6 @@ const createMessage = async (req: CustomRequest, res: Response) => {
 
             else res.status(200).send(messages.data);
         }
-
-        res.status(400).send({ err: "Invalid request" });
     }
     catch (err) {
         console.log(err);

@@ -41,7 +41,7 @@ const createTempMessage = async ({ threadId, userId, content }: {
         const assistantMessage = await assistantService.createAssistantMessage({ threadId, messageData });
 
         let tempMessageData: ICreateTempMessage = {
-            ...assistantMessage.data,
+            id: assistantMessage.data.id,
             role: "user",
             content: { text: content },
             temp_thread_id: threadId,

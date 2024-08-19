@@ -108,18 +108,24 @@ const runTempAssistant = async ({ threadId, tempUserId }: {
     tempUserId: string;
 }): Promise<Record<"data", ITempMessage> | Record<"err", string>> => {
     try {
-        const run = await openai.beta.threads.runs.create(threadId, { assistant_id: process.env.OPENAI_ASSISTANT_ID as string });
+        let run = await openai.beta.threads.runs.create(threadId, { assistant_id: process.env.OPENAI_ASSISTANT_ID as string });
+        while (run.status !== "completed") {
+            await delay(5000); // Wait for 5 seconds
+            run = await openai.beta.threads.runs.retrieve(threadId,run.id); // Re-fetch the run status
+            console.log(`Polling status: ${run.status}`);
+        }
+
         const assistantResponse = await fetchLatestMessage(run.thread_id);
         if ("err" in assistantResponse) return { err: "Failed to fetch assistant response" };
 
         if (assistantResponse.data.content[0].type !== "text") return { err: "Invalid Assistant response!" };
 
-        const responseContent = assistantResponse.data.content[0].text.value;
+        const responseContent : { script: string; voice: string } = JSON.parse(assistantResponse.data.content[0].text.value);
         const messageData: ICreateTempMessage = {
             temp_user: tempUserId,
             id: assistantResponse.data.id,
             role: assistantResponse.data.role,
-            content: { responseContent },
+            content: responseContent,
             temp_thread_id: run.thread_id
         }
         const savedResponse = await tempMessageService.saveTempAssistantResponse(messageData);
@@ -132,6 +138,8 @@ const runTempAssistant = async ({ threadId, tempUserId }: {
         throw err;
     }
 }
+
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export default {
     getAssistantThread,

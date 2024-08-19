@@ -4,6 +4,7 @@ dotenv.config();
 import cors from 'cors';
 import userRoutes from './routes/userRoutes';
 import session from "express-session";
+import { chatRoutes } from './routes/chatRoutes';
 
 const app = express();
 
@@ -21,11 +22,12 @@ app.use(session({
 }));
 
 app.get('/', (req:Request,res:Response)=> res.status(200).send({data:"voxtone server."}));
-app.get('/api/users',userRoutes);
+app.use('/api/users',userRoutes);
+app.use('/api/chat',chatRoutes);
 
 
 
 const PORT = process.env.PORT || 3000;
-app.listen(8000, async ()=>{
+app.listen(PORT, async ()=>{
 console.log(`Voxtone server running at port - ${PORT}`);
 });
