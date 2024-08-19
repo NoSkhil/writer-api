@@ -1,3 +1,4 @@
 node_modules
+/audio
 # Keep environment variables out of version control
 .env
