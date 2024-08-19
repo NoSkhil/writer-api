@@ -17,19 +17,6 @@ const getMessage = async (id: string): Promise<Record<"data", IMessage> | Record
     }
 };
 
-const saveAssistantResponse = async (messageData:ICreateMessage) : Promise <Record<"data",IMessage>| Record<"err",string>> => {
-    try {
-        const saveMessage = await createMessage(messageData);
-        if ("err" in saveMessage) return {err:saveMessage.err};
-
-        return {data:saveMessage.data};
-    }
-    catch (err) {
-        console.log(err);
-        throw err;
-    }
-}
-
 const createMessage = async (messageData: ICreateMessage): Promise<Record<"data", IMessage> | Record<"err", string>> => {
     try {
         const thread = await db.threads.findUnique({ where: { id: messageData.thread_id } });
@@ -46,6 +33,5 @@ const createMessage = async (messageData: ICreateMessage): Promise<Record<"data"
 
 export default {
     getMessage,
-    createMessage,
-    saveAssistantResponse
+    createMessage
 };

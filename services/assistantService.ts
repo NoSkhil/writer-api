@@ -92,7 +92,7 @@ const runAssistant = async ({ threadId, userId }: {
             content: { responseContent },
             thread_id: run.thread_id
         }
-        const savedResponse = await messageService.saveAssistantResponse(messageData);
+        const savedResponse = await messageService.createMessage(messageData);
         if ("err" in savedResponse) return { err: "Failed to save assistant response!" };
 
         return { data: savedResponse.data };
@@ -128,7 +128,7 @@ const runTempAssistant = async ({ threadId, tempUserId }: {
             content: responseContent,
             temp_thread_id: run.thread_id
         }
-        const savedResponse = await tempMessageService.saveTempAssistantResponse(messageData);
+        const savedResponse = await tempMessageService.createTempMessage(messageData);
         if ("err" in savedResponse) return { err: "Failed to save assistant response!" };
 
         return { data: savedResponse.data };
