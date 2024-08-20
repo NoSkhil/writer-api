@@ -5,7 +5,7 @@ type ICreateTempThread = Prisma.temp_threadsCreateInput;
 
 const getThread = async (id: string): Promise<Record<"data", ITempThread> | Record<"err", string>> => {
     try {
-        const thread = await db.temp_threads.findFirst(id);
+        const thread = await db.temp_threads.findUnique({where:{id}});
         if (!thread) return { err: "Invalid Temp Thread ID." };
 
         else return { data: thread };

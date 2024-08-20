@@ -1,11 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
-  previewFeatures = ["omitApi"]
+  provider        = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -19,16 +18,16 @@ model users {
   profile_picture_url String?
   created_date        DateTime   @default(now())
   updated_date        DateTime   @default(now()) @updatedAt
-  threads             threads[]
   messages            messages[]
+  threads             threads[]
 }
 
 model threads {
   id           String     @id @unique
   created_date DateTime   @default(now())
-  user         users      @relation(fields: [user_id], references: [id])
   user_id      String
   messages     messages[]
+  user         users      @relation(fields: [user_id], references: [id])
 }
 
 model messages {
@@ -36,10 +35,10 @@ model messages {
   created_date DateTime @default(now())
   role         role
   content      Json
-  thread       threads  @relation(fields: [thread_id], references: [id])
-  user         users    @relation(fields: [user_id], references: [id])
   thread_id    String
   user_id      String
+  thread       threads  @relation(fields: [thread_id], references: [id])
+  user         users    @relation(fields: [user_id], references: [id])
 }
 
 model logs {
@@ -61,9 +60,9 @@ model temp_messages {
   role           role
   content        Json
   created_date   DateTime     @default(now())
-  temp_thread    temp_threads @relation(fields: [temp_thread_id], references: [id])
   temp_user      String
   temp_thread_id String
+  temp_thread    temp_threads @relation(fields: [temp_thread_id], references: [id])
 }
 
 enum role {
