@@ -76,8 +76,8 @@ const runAssistant = async ({ threadId, userId }: {
     try {
         let run = await openai.beta.threads.runs.create(threadId, { assistant_id: process.env.OPENAI_ASSISTANT_ID as string });
 
-        const fetchCompletedRun = await pollAssistantRunStatus({threadId,runId:run.id});
-        if ("err" in fetchCompletedRun) return {err:fetchCompletedRun.err};
+        const fetchCompletedRun = await pollAssistantRunStatus({ threadId, runId: run.id });
+        if ("err" in fetchCompletedRun) return { err: fetchCompletedRun.err };
 
         run = fetchCompletedRun.data;
 
@@ -86,7 +86,7 @@ const runAssistant = async ({ threadId, userId }: {
 
         if (assistantResponse.data.content[0].type !== "text") return { err: "Invalid Assistant response!" };
 
-        const responseContent : { script: string; voice: string } = JSON.parse(assistantResponse.data.content[0].text.value);
+        const responseContent: { script: string; voice: string } = JSON.parse(assistantResponse.data.content[0].text.value);
         const messageData: ICreateMessage = {
             user_id: userId,
             id: assistantResponse.data.id,
@@ -112,8 +112,8 @@ const runTempAssistant = async ({ threadId, tempUserId }: {
     try {
         let run = await openai.beta.threads.runs.create(threadId, { assistant_id: process.env.OPENAI_ASSISTANT_ID as string });
 
-        const fetchCompletedRun = await pollAssistantRunStatus({threadId,runId:run.id});
-        if ("err" in fetchCompletedRun) return {err:fetchCompletedRun.err};
+        const fetchCompletedRun = await pollAssistantRunStatus({ threadId, runId: run.id });
+        if ("err" in fetchCompletedRun) return { err: fetchCompletedRun.err };
 
         run = fetchCompletedRun.data;
 
@@ -122,7 +122,7 @@ const runTempAssistant = async ({ threadId, tempUserId }: {
 
         if (assistantResponse.data.content[0].type !== "text") return { err: "Invalid Assistant response!" };
 
-        const responseContent : { script: string; voice: string } = JSON.parse(assistantResponse.data.content[0].text.value);
+        const responseContent: { script: string; voice: string } = JSON.parse(assistantResponse.data.content[0].text.value);
         const messageData: ICreateTempMessage = {
             temp_user: tempUserId,
             id: assistantResponse.data.id,
@@ -141,7 +141,10 @@ const runTempAssistant = async ({ threadId, tempUserId }: {
     }
 }
 
-const pollAssistantRunStatus = async ({threadId, runId}:{threadId:string; runId:string;}) : Promise<Record<"data",IAssistantRun> | Record<"err",string>> => {
+const pollAssistantRunStatus = async ({ threadId, runId }: {
+    threadId: string;
+    runId: string;
+}): Promise<Record<"data", IAssistantRun> | Record<"err", string>> => {
     try {
         // Add the maximum number of retries here, make it an enum.
         let maxRetries = 5;
@@ -156,13 +159,13 @@ const pollAssistantRunStatus = async ({threadId, runId}:{threadId:string; runId:
             console.log(`Polling status: ${run.status}`);
 
             if (run.status === "completed") {
-                return {data:run};
+                return { data: run };
             }
 
             // Increment the retry count and check if we've exceeded the maximum
             retryCount++;
             if (retryCount > maxRetries) {
-                return {err:"Failed to fetch Assistant response! - Maximum number of retries exceeded."};
+                return { err: "Failed to fetch Assistant response! - Maximum number of retries exceeded." };
             }
         }
     } catch (err) {
