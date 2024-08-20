@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+import type OpenAI from "openai";
 
 type IAssistantThread = OpenAI.Beta.Threads.Thread;
 type ICreateAssistantMessage = OpenAI.Beta.Threads.MessageCreateParams;

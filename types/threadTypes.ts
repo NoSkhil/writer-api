@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import type { threads as IThread, temp_threads as ITempThread } from '@prisma/client';
 
 type ICreateThread = Prisma.threadsUncheckedCreateInput;
