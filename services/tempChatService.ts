@@ -5,6 +5,7 @@ import ttsService from "./ttsService";
 import { ITempThread, ICreateTempThread } from "../types/threadTypes";
 import { ICreateTempMessage, ITempMessage } from "../types/messageTypes";
 import { ICreateAssistantMessage } from "../types/openaiTypes";
+import { CHAT_ROLE } from "../types/chatRoleTypes";
 
 const initialiseTempChat = async (userId: string): Promise<Record<"data", ITempThread> | Record<"err", string>> => {
     try {
@@ -33,13 +34,13 @@ const createTempMessage = async ({ threadId, userId, content }: {
     try {
         let assistantMessageData: ICreateAssistantMessage = {
             content,
-            role: "user"
+            role: CHAT_ROLE.USER
         }
         const assistantMessage = await assistantService.createAssistantMessage({ threadId, messageData: assistantMessageData });
 
         let tempMessageData: ICreateTempMessage = {
             id: assistantMessage.data.id,
-            role: "user",
+            role: CHAT_ROLE.ASSISTANT,
             content: { text: content },
             temp_thread_id: threadId,
             temp_user: userId

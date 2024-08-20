@@ -6,6 +6,7 @@ import { ICreateAssistantMessage } from "../types/openaiTypes";
 import { ICreateThread, IThread } from "../types/threadTypes";
 import { ICreateMessage, IMessage } from "../types/messageTypes";
 import { IUser } from "../types/userTypes";
+import { CHAT_ROLE } from "../types/chatRoleTypes";
 
 
 const initialiseChat = async (userId: string): Promise<Record<"data", IThread> | Record<"err", string>> => {
@@ -35,13 +36,13 @@ const createMessage = async ({ threadId, user, content }: {
     try {
         let assistantMessageData: ICreateAssistantMessage = {
             content,
-            role: "user"
+            role: CHAT_ROLE.USER
         }
         const assistantMessage = await assistantService.createAssistantMessage({ threadId, messageData: assistantMessageData });
 
         let messageData: ICreateMessage = {
             id: assistantMessage.data.id,
-            role: "user",
+            role: CHAT_ROLE.USER,
             content: { text: content },
             thread_id: threadId,
             user_id: user.id
