@@ -40,7 +40,7 @@ const createTempMessage = async ({ threadId, userId, content }: {
 
         let tempMessageData: ICreateTempMessage = {
             id: assistantMessage.data.id,
-            role: CHAT_ROLE.ASSISTANT,
+            role: CHAT_ROLE.USER,
             content: { text: content },
             temp_thread_id: threadId,
             temp_user: userId
