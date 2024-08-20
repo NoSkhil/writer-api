@@ -37,8 +37,8 @@ import { v4 as uuidv4 } from 'uuid';
         );
       });
     } catch (err) {
-      console.error('Error occurred:', err);
-      return { err: 'An unexpected error occurred' };
+      console.log(err);
+      throw err;
     }
   };
 
