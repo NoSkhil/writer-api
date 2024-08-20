@@ -83,7 +83,6 @@ const runAssistant = async ({ threadId, userId }: {
 
         const assistantResponse = await fetchLatestMessage(run.thread_id);
         if ("err" in assistantResponse) return { err: "Failed to fetch assistant response" };
-
         if (assistantResponse.data.content[0].type !== "text") return { err: "Invalid Assistant response!" };
 
         const responseContent: { script: string; voice: string } = JSON.parse(assistantResponse.data.content[0].text.value);
@@ -94,8 +93,9 @@ const runAssistant = async ({ threadId, userId }: {
             content: responseContent,
             thread_id: run.thread_id
         }
+        
         const savedResponse = await messageService.createMessage(messageData);
-        if ("err" in savedResponse) return { err: "Failed to save assistant response!" };
+        if ("err" in savedResponse) return { err: savedResponse.err };
 
         return { data: savedResponse.data };
     }
@@ -131,7 +131,7 @@ const runTempAssistant = async ({ threadId, tempUserId }: {
             temp_thread_id: run.thread_id
         }
         const savedResponse = await tempMessageService.createTempMessage(messageData);
-        if ("err" in savedResponse) return { err: "Failed to save assistant response!" };
+        if ("err" in savedResponse) return { err: savedResponse.err };
 
         return { data: savedResponse.data };
     }
