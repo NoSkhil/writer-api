@@ -93,7 +93,7 @@ const runAssistant = async ({ threadId, userId }: {
             content: responseContent,
             thread_id: run.thread_id
         }
-        
+
         const savedResponse = await messageService.createMessage(messageData);
         if ("err" in savedResponse) return { err: savedResponse.err };
 
@@ -145,13 +145,14 @@ const pollAssistantRunStatus = async ({ threadId, runId }: {
     threadId: string;
     runId: string;
 }): Promise<Record<"data", IAssistantRun> | Record<"err", string>> => {
+    //CHECK OPENAI API REF THERE MUST BE A CALLBACK ON COMPLETION, REMOVE THIS SHIT ASAP
     try {
         // Add the maximum number of retries here, make it an enum.
         let maxRetries = 5;
         let retryCount = 0;
 
         while (true) {
-            // Using a manual delay for now because it costs more to stream the data from openai or ping the API repeatedly.
+            // Using a manual delay for now because it costs more to stream the data from openai.
             await delay(5000); // Wait for 5 seconds
 
             // Re-fetch the run status

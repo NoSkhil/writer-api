@@ -76,6 +76,7 @@ const createMessage = async ({ threadId, user, content }: {
 
 const generateInstantAudioAd = async (user: IUser, assistantResponse: IMessage): Promise<{ data: string } | { err: string }> => {
     try {
+    //Find a cleaner way to access these params safely
     if (user.user_options &&
         typeof user.user_options === "object" &&
         "instantAudioGeneration" in user.user_options &&
