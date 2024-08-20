@@ -55,14 +55,20 @@ const createTempMessage = async ({ threadId, userId, content }: {
         const runAssistant = await assistantService.runTempAssistant({ threadId, tempUserId: userId });
         if ("err" in runAssistant) return { err: runAssistant.err };
 
-        if (runAssistant.data.content && typeof runAssistant.data.content === "object" && "script" in runAssistant.data.content && typeof runAssistant.data.content.script === "string" && typeof runAssistant.data.content.voice === "string") {
+        if (runAssistant.data.content && 
+            typeof runAssistant.data.content === "object" && 
+            "script" in runAssistant.data.content && 
+            "voice" in runAssistant.data.content && 
+            typeof runAssistant.data.content.script === "string" && 
+            typeof runAssistant.data.content.voice === "string"
+        ) {
             const script = runAssistant.data.content.script;
             const voice = runAssistant.data.content.voice;
             const tts = await ttsService.synthesizeSpeech({text:script,voice});
             if ("err" in tts) console.log(tts.err);
             if ("data" in tts) console.log(tts.data);
         }
-
+        
         return {
             data: {
                 message: tempMessage.data,
@@ -75,7 +81,6 @@ const createTempMessage = async ({ threadId, userId, content }: {
         throw err;
     }
 }
-
 
 export default {
     initialiseTempChat,
