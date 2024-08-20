@@ -145,7 +145,7 @@ const pollAssistantRunStatus = async ({ threadId, runId }: {
     threadId: string;
     runId: string;
 }): Promise<Record<"data", IAssistantRun> | Record<"err", string>> => {
-    //CHECK OPENAI API REF THERE MUST BE A CALLBACK ON COMPLETION, REMOVE THIS SHIT ASAP
+    //CHECK OPENAI API REF THERE MUST BE A CALLBACK ON COMPLETION, REMOVE ALL THIS SHIT ASAP
     try {
         // Max Retry Limit, make it an enum.
         let maxRetries = 5;
