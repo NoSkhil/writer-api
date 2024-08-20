@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import userService from "../services/userService";
 import {Request, Response, NextFunction} from "express";
 import { ICreateUser } from "../types/userTypes";

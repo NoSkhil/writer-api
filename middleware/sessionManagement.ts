@@ -1,5 +1,4 @@
-import type { users as IUser } from '@prisma/client';
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import userService from '../services/userService';
 import { randomBytes } from 'crypto';
 import { CustomRequest } from '../types/requestTypes';
