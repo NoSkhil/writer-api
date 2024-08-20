@@ -1,8 +1,7 @@
 import { Prisma } from "@prisma/client";
 import userService from "../services/userService";
 import {Request, Response, NextFunction} from "express";
-
-type ICreateUser = Prisma.usersCreateInput;
+import { ICreateUser } from "../types/userTypes";
 
 
 const getUserByEmail = async (req:Request,res:Response,next:NextFunction) => {

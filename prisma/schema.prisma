@@ -16,6 +16,7 @@ model users {
   email               String
   phone_number        String
   profile_picture_url String?
+  user_options        Json @default("{}")
   created_date        DateTime   @default(now())
   updated_date        DateTime   @default(now()) @updatedAt
   messages            messages[]

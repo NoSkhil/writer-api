@@ -1,8 +1,5 @@
 import db from '../prisma/client';
-import { Prisma } from '@prisma/client';
-import { messages as IMessage } from '@prisma/client';
-
-type ICreateMessage = Prisma.messagesUncheckedCreateInput;
+import { IMessage, ICreateMessage } from '../types/messageTypes';
 
 const getMessage = async (id: string): Promise<Record<"data", IMessage> | Record<"err", string>> => {
     try {

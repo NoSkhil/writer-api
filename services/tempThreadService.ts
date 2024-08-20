@@ -1,7 +1,5 @@
 import db from '../prisma/client';
-import { type temp_threads as ITempThread, Prisma } from '@prisma/client';
-
-type ICreateTempThread = Prisma.temp_threadsCreateInput;
+import { ICreateTempThread, ITempThread } from '../types/threadTypes';
 
 const getThread = async (id: string): Promise<Record<"data", ITempThread> | Record<"err", string>> => {
     try {

@@ -1,8 +1,6 @@
 import db from '../prisma/client';
+import { IThread, ICreateThread } from '../types/threadTypes';
 
-import { Prisma, type threads as IThread } from '@prisma/client';
-
-type ICreateThread = Prisma.threadsCreateInput;
 
 const getThread = async (id: string): Promise<Record<"data", IThread> | Record<"err", string>> => {
     try {

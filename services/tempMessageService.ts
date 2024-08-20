@@ -1,8 +1,6 @@
 import db from '../prisma/client';
-import { Prisma } from '@prisma/client';
-import { temp_messages as ITempMessage } from '@prisma/client';
+import { ITempMessage, ICreateTempMessage } from '../types/messageTypes';
 
-type ICreateTempMessage = Prisma.temp_messagesUncheckedCreateInput;
 
 const getTempMessage = async (id: string): Promise<Record<"data", ITempMessage> | Record<"err", string>> => {
     try {

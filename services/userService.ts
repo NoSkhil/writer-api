@@ -1,9 +1,6 @@
 import db from '../prisma/client';
 import * as argon2 from "argon2";
-import { type users as IUser, Prisma } from '@prisma/client';
-import { hash } from 'crypto';
-
-type ICreateUser = Prisma.usersCreateInput;
+import { ICreateUser, IUser } from '../types/userTypes';
 
 const getUserById = async (id: string): Promise<Record<"data", IUser> | Record<"err", string>> => {
     try {

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { CustomRequest } from '../types/requestTypes';
-import chatService from "../services/chatService";
+import tempChatService from "../services/tempChatService";
 
 const initialiseChat = async (req: CustomRequest, res: Response) => {
     try {
@@ -8,7 +8,7 @@ const initialiseChat = async (req: CustomRequest, res: Response) => {
 
         }
         else if (req.session.tempUserId) {
-            const thread = await chatService.initialiseTempChat(req.session.tempUserId);
+            const thread = await tempChatService.initialiseTempChat(req.session.tempUserId);
             if ("err" in thread) res.status(400).send(thread.err);
 
             else res.status(200).send(thread.data);
@@ -22,13 +22,13 @@ const initialiseChat = async (req: CustomRequest, res: Response) => {
 
 const createMessage = async (req: CustomRequest, res: Response) => {
     try {
-        const { threadId, content } = req.body;
+        const { threadId, content } : {threadId:string;content:string;} = req.body;
 
         if (req.user) {
 
         }
         else if (req.session.tempUserId) {
-            const messages = await chatService.createTempMessage({ threadId, content, userId: req.session.tempUserId });
+            const messages = await tempChatService.createTempMessage({ threadId, content, userId: req.session.tempUserId });
             if ("err" in messages) res.status(400).send(messages.err);
 
             else res.status(200).send(messages.data);

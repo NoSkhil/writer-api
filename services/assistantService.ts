@@ -1,4 +1,3 @@
-import { Prisma, type temp_messages as ITempMessage, type messages as IMessage } from "@prisma/client";
 import OpenAI from "openai";
 import tempMessageService from "./tempMessageService";
 import messageService from "./messageService";
@@ -6,12 +5,9 @@ import messageService from "./messageService";
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY as string
 });
+import { IAssistantMessage, IAssistantThread, ICreateAssistantMessage } from "../types/openaiTypes";
+import { ICreateMessage, ICreateTempMessage, ITempMessage, IMessage } from "../types/messageTypes";
 
-type IAssistantThread = OpenAI.Beta.Threads.Thread;
-type ICreateAssistantMessage = OpenAI.Beta.Threads.MessageCreateParams;
-type IAssistantMessage = OpenAI.Beta.Threads.Message;
-type ICreateMessage = Prisma.messagesUncheckedCreateInput;
-type ICreateTempMessage = Prisma.temp_messagesUncheckedCreateInput;
 
 const getAssistantThread = async (id: string): Promise<Record<"data", IAssistantThread> | Record<"err", string>> => {
     try {
@@ -78,18 +74,24 @@ const runAssistant = async ({ threadId, userId }: {
     userId: string;
 }): Promise<Record<"data", IMessage> | Record<"err", string>> => {
     try {
-        const run = await openai.beta.threads.runs.create(threadId, { assistant_id: process.env.OPENAI_ASSISTANT_ID as string });
+        let run = await openai.beta.threads.runs.create(threadId, { assistant_id: process.env.OPENAI_ASSISTANT_ID as string });
+        while (run.status !== "completed") {
+            await delay(5000); // Wait for 5 seconds
+            run = await openai.beta.threads.runs.retrieve(threadId,run.id); // Re-fetch the run status
+            console.log(`Polling status: ${run.status}`);
+        }
+
         const assistantResponse = await fetchLatestMessage(run.thread_id);
         if ("err" in assistantResponse) return { err: "Failed to fetch assistant response" };
 
         if (assistantResponse.data.content[0].type !== "text") return { err: "Invalid Assistant response!" };
 
-        const responseContent = assistantResponse.data.content[0].text.value;
+        const responseContent : { script: string; voice: string } = JSON.parse(assistantResponse.data.content[0].text.value);
         const messageData: ICreateMessage = {
             user_id: userId,
             id: assistantResponse.data.id,
             role: assistantResponse.data.role,
-            content: { responseContent },
+            content: responseContent,
             thread_id: run.thread_id
         }
         const savedResponse = await messageService.createMessage(messageData);
@@ -109,10 +111,12 @@ const runTempAssistant = async ({ threadId, tempUserId }: {
 }): Promise<Record<"data", ITempMessage> | Record<"err", string>> => {
     try {
         let run = await openai.beta.threads.runs.create(threadId, { assistant_id: process.env.OPENAI_ASSISTANT_ID as string });
+
+        //add a maximum number of retries here!
         while (run.status !== "completed") {
             await delay(5000); // Wait for 5 seconds
             run = await openai.beta.threads.runs.retrieve(threadId,run.id); // Re-fetch the run status
-            console.log(`Polling status: ${run.status}`);
+            console.log(`Assistant run status: ${run.status}`);
         }
 
         const assistantResponse = await fetchLatestMessage(run.thread_id);

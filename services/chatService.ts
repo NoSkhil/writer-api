@@ -1,27 +1,25 @@
-import { Prisma } from "@prisma/client"
-import OpenAI from "openai";
-import type { temp_threads as ITempThread, temp_messages as ITempMessage } from "@prisma/client"
-import tempThreadService from "./tempThreadService";
-import tempMessageService from "./tempMessageService";
+import threadService from "./threadService";
+import messageService from "./messageService";
 import assistantService from "./assistantService";
 import ttsService from "./ttsService";
+import { ICreateAssistantMessage } from "../types/openaiTypes";
+import { ICreateThread, IThread } from "../types/threadTypes";
+import { ICreateMessage, IMessage } from "../types/messageTypes";
+import { IUser } from "../types/userTypes";
 
-type ITempThreadsCreateInput = Prisma.temp_threadsCreateInput;
-type ICreateAssistantMessage = OpenAI.Beta.Threads.MessageCreateParams;
-type ICreateTempMessage = Prisma.temp_messagesUncheckedCreateInput;
 
-const initialiseTempChat = async (userId: string): Promise<Record<"data", ITempThread> | Record<"err", string>> => {
+const initialiseChat = async (userId: string): Promise<Record<"data", IThread> | Record<"err", string>> => {
     try {
         const initialiseAssistantThread = await assistantService.createAssistantThread();
         const openaiThreadData = initialiseAssistantThread.data;
 
-        const tempThreadData: ITempThreadsCreateInput = {
+        const threadData: ICreateThread = {
             id: openaiThreadData.id,
-            temp_user: userId
+            user_id: userId
         }
-        const initialiseTempThread = await tempThreadService.createThread(tempThreadData);
+        const initialiseThread = await threadService.createThread(threadData);
 
-        return { data: initialiseTempThread.data };
+        return { data: initialiseThread.data };
     }
     catch (err) {
         console.log(err);
@@ -29,50 +27,43 @@ const initialiseTempChat = async (userId: string): Promise<Record<"data", ITempT
     }
 }
 
-const createTempMessage = async ({ threadId, userId, content }: {
+const createMessage = async ({ threadId, user, content }: {
     threadId: string;
     content: string;
-    userId: string;
-}): Promise<Record<"data", { message: ITempMessage; assistantResponse: ITempMessage }> | Record<"err", string>> => {
+    user: IUser;
+}): Promise<Record<"data", { message: IMessage; assistantResponse: IMessage, audioAdFile: string | null }> | Record<"err", string>> => {
     try {
-        let messageData: ICreateAssistantMessage = {
+        let assistantMessageData: ICreateAssistantMessage = {
             content,
             role: "user"
         }
-        const assistantMessage = await assistantService.createAssistantMessage({ threadId, messageData });
+        const assistantMessage = await assistantService.createAssistantMessage({ threadId, messageData: assistantMessageData });
 
-        let tempMessageData: ICreateTempMessage = {
+        let messageData: ICreateMessage = {
             id: assistantMessage.data.id,
             role: "user",
             content: { text: content },
-            temp_thread_id: threadId,
-            temp_user: userId
+            thread_id: threadId,
+            user_id: user.id
         }
 
-        const tempMessage = await tempMessageService.createTempMessage(tempMessageData);
-        if ("err" in tempMessage) return { err: tempMessage.err };
+        const message = await messageService.createMessage(messageData);
+        if ("err" in message) return { err: message.err };
 
-        const runAssistant = await assistantService.runTempAssistant({ threadId, tempUserId: userId });
+        const runAssistant = await assistantService.runAssistant({ threadId, userId:user.id });
         if ("err" in runAssistant) return { err: runAssistant.err };
 
-        if (runAssistant.data.content && 
-            typeof runAssistant.data.content === "object" && 
-            "script" in runAssistant.data.content && 
-            "voice" in runAssistant.data.content && 
-            typeof runAssistant.data.content.script === "string" && 
-            typeof runAssistant.data.content.voice === "string"
-        ) {
-            const script = runAssistant.data.content.script;
-            const voice = runAssistant.data.content.voice;
-            const tts = await ttsService.synthesizeSpeech({text:script,voice});
-            if ("err" in tts) console.log(tts.err);
-            if ("data" in tts) console.log(tts.data);
+        let audioAdFile: string|null = null;
+        const audioGeneration = await generateInstantAudioAd(user, runAssistant.data);
+        if ("data" in audioGeneration) {
+            audioAdFile = audioGeneration.data;
         }
         
         return {
             data: {
-                message: tempMessage.data,
-                assistantResponse: runAssistant.data
+                message: message.data,
+                assistantResponse: runAssistant.data,
+                audioAdFile
             }
         };
     }
@@ -82,7 +73,39 @@ const createTempMessage = async ({ threadId, userId, content }: {
     }
 }
 
+const generateInstantAudioAd = async (user: IUser, assistantResponse: IMessage): Promise<{ data: string } | { err: string }> => {
+    try {
+    if (user.user_options &&
+        typeof user.user_options === "object" &&
+        "instantAudioGeneration" in user.user_options &&
+
+        assistantResponse.content && 
+        typeof assistantResponse.content === "object" && 
+        "script" in assistantResponse.content && 
+        "voice" in assistantResponse.content && 
+
+        typeof assistantResponse.content.script === "string" && 
+        typeof assistantResponse.content.voice === "string"
+    ) {
+        const script = assistantResponse.content.script;
+        const voice = assistantResponse.content.voice;
+        const tts = await ttsService.synthesizeSpeech({text: script, voice});
+        if ("err" in tts) return { err: "Failed to synthesize speech!" };
+        if ("data" in tts) {
+
+            //store mp3 in s3 and return signed s3 link.
+            return { data: tts.data };
+        }
+    }
+    return { err: "Instant Audio generation not applicable" };
+    } catch(err) {
+        console.log(err);
+        //Don't throw err here, this service is not critical to returning the chat response.
+        return { err: "Internal server error - Instant Audio generation failed!" };
+    }
+}
+
 export default {
-    initialiseTempChat,
-    createTempMessage
+    initialiseChat,
+    createMessage
 }
