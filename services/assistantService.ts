@@ -5,7 +5,7 @@ import messageService from "./messageService";
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY as string
 });
-import { IAssistantMessage, IAssistantThread, ICreateAssistantMessage } from "../types/openaiTypes";
+import { IAssistantMessage, IAssistantThread, ICreateAssistantMessage, IAssistantRun } from "../types/openaiTypes";
 import { ICreateMessage, ICreateTempMessage, ITempMessage, IMessage } from "../types/messageTypes";
 
 
@@ -75,11 +75,11 @@ const runAssistant = async ({ threadId, userId }: {
 }): Promise<Record<"data", IMessage> | Record<"err", string>> => {
     try {
         let run = await openai.beta.threads.runs.create(threadId, { assistant_id: process.env.OPENAI_ASSISTANT_ID as string });
-        while (run.status !== "completed") {
-            await delay(5000); // Wait for 5 seconds
-            run = await openai.beta.threads.runs.retrieve(threadId,run.id); // Re-fetch the run status
-            console.log(`Polling status: ${run.status}`);
-        }
+
+        const fetchCompletedRun = await pollAssistantRunStatus({threadId,runId:run.id});
+        if ("err" in fetchCompletedRun) return {err:fetchCompletedRun.err};
+
+        run = fetchCompletedRun.data;
 
         const assistantResponse = await fetchLatestMessage(run.thread_id);
         if ("err" in assistantResponse) return { err: "Failed to fetch assistant response" };
@@ -112,12 +112,10 @@ const runTempAssistant = async ({ threadId, tempUserId }: {
     try {
         let run = await openai.beta.threads.runs.create(threadId, { assistant_id: process.env.OPENAI_ASSISTANT_ID as string });
 
-        //add a maximum number of retries here!
-        while (run.status !== "completed") {
-            await delay(5000); // Wait for 5 seconds
-            run = await openai.beta.threads.runs.retrieve(threadId,run.id); // Re-fetch the run status
-            console.log(`Assistant run status: ${run.status}`);
-        }
+        const fetchCompletedRun = await pollAssistantRunStatus({threadId,runId:run.id});
+        if ("err" in fetchCompletedRun) return {err:fetchCompletedRun.err};
+
+        run = fetchCompletedRun.data;
 
         const assistantResponse = await fetchLatestMessage(run.thread_id);
         if ("err" in assistantResponse) return { err: "Failed to fetch assistant response" };
@@ -142,6 +140,36 @@ const runTempAssistant = async ({ threadId, tempUserId }: {
         throw err;
     }
 }
+
+const pollAssistantRunStatus = async ({threadId, runId}:{threadId:string; runId:string;}) : Promise<Record<"data",IAssistantRun> | Record<"err",string>> => {
+    try {
+        // Add the maximum number of retries here, make it an enum.
+        let maxRetries = 5;
+        let retryCount = 0;
+
+        while (true) {
+            // Using a manual delay for now because it costs more to stream the data from openai or ping the API repeatedly.
+            await delay(5000); // Wait for 5 seconds
+
+            // Re-fetch the run status
+            const run = await openai.beta.threads.runs.retrieve(threadId, runId);
+            console.log(`Polling status: ${run.status}`);
+
+            if (run.status === "completed") {
+                return {data:run};
+            }
+
+            // Increment the retry count and check if we've exceeded the maximum
+            retryCount++;
+            if (retryCount > maxRetries) {
+                return {err:"Failed to fetch Assistant response! - Maximum number of retries exceeded."};
+            }
+        }
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
+};
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
