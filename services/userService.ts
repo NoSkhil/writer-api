@@ -28,7 +28,10 @@ const getUserByEmail = async (email: string): Promise<Record<"data", IUser> | Re
     }
 };
 
-const login = async (email: string, password: string): Promise<Record<"data", IUser> | Record<"err", string>> => {
+const login = async ({email, password}:{
+    email:string; 
+    password:string;
+}): Promise<Record<"data", IUser> | Record<"err", string>> => {
     try {
         const user = await db.users.findFirst({where:{email}});
         if (!user) return { err: "Invalid Credentials" };
