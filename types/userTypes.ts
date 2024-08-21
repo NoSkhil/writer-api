@@ -8,8 +8,13 @@ type IUserLoginRequest = {
 
 type ICreateUser = Prisma.usersCreateInput;
 
+enum USER_OPTIONS {
+    INSTANT_AUDIO_GENERATION = "instantAudioGeneration"
+}
+
 export {
     IUser,
     IUserLoginRequest,
-    ICreateUser
+    ICreateUser,
+    USER_OPTIONS
 };

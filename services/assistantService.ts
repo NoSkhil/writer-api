@@ -145,7 +145,7 @@ const pollAssistantRunStatus = async ({ threadId, runId }: {
     threadId: string;
     runId: string;
 }): Promise<Record<"data", IAssistantRun> | Record<"err", string>> => {
-    //CHECK OPENAI API REF THERE MUST BE A CALLBACK ON COMPLETION, REMOVE ALL THIS SHIT ASAP
+    //CHECK OPENAI API REF THERE MUST BE A CALLBACK ON COMPLETION, REMOVE THIS SHIT ASAP
     try {
         // Max Retry Limit, make it an enum.
         let maxRetries = 5;
@@ -153,7 +153,7 @@ const pollAssistantRunStatus = async ({ threadId, runId }: {
 
         while (true) {
             // Using a manual delay for now because it costs more to stream the data from openai.
-            await delay(5000); // Wait for 5 seconds
+            await delay(2500); // Wait for 2.5 seconds
 
             // Re-fetch the run status
             const run = await openai.beta.threads.runs.retrieve(threadId, runId);
