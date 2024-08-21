@@ -18,7 +18,7 @@ const getUserByEmail = async (req:Request,res:Response,next:NextFunction) => {
 const login = async (req:Request,res:Response,next:NextFunction) => {
     try{
         const {email,password} = req.body;
-        const user = await userService.login(email,password);
+        const user = await userService.login({email,password});
         if ("err" in user) return res.status(301).send({err:user.err});
 
         res.status(200).send({data:user.data});

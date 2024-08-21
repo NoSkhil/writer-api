@@ -14,7 +14,8 @@ model users {
   last_name           String
   password            String
   email               String
-  phone_number        String
+  phone_number        String?
+  country             String?
   profile_picture_url String?
   user_options        Json @default("{}")
   created_date        DateTime   @default(now())
