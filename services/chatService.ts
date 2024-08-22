@@ -75,11 +75,12 @@ const createMessage = async ({ threadId, user, content }: {
 const generateInstantAudioAd = async (user: IUser, assistantResponse: IMessage): Promise<{ data: string } | { err: string }> => {
     try {
         //Find a cleaner way to access these params safely
-
+        const instantAudioGeneration = USER_OPTIONS.INSTANT_AUDIO_GENERATION ;
         //Check if User has the "Instant Audio Generation" option enabled
         if (user.user_options &&
             typeof user.user_options === "object" &&
-            USER_OPTIONS.INSTANT_AUDIO_GENERATION in user.user_options &&
+            instantAudioGeneration in user.user_options &&
+            user.user_options.instantAudioGeneration === true &&
 
             //Check if the message contains a valid script and voice selection.
             assistantResponse.content &&

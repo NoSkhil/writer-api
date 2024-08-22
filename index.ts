@@ -22,7 +22,7 @@ app.use(session({
 }));
 
 app.get('/', (req:Request,res:Response)=> res.status(200).send({data:"voxtone server."}));
-app.use('/api/users',userRoutes);
+app.use('/api/user',userRoutes);
 app.use('/api/chat',chatRoutes);
 
 

@@ -12,14 +12,13 @@ const getUserByEmail = async (req:Request,res:Response,next:NextFunction) => {
 
         res.status(200).send({data:user.data});
     } catch (err) {
-        res.status(500).send(err);
+        console.log(err);
+        res.status(500).send({ err: "Internal server error!" });
     }
 }
 
 const login = async (req:CustomRequest,res:Response,next:NextFunction) => {
     try{
-        if (req.user) return res.status(200).send({data:req.user});
-
         const {email,password} = req.body;
         const user = await userService.login({email,password});
         if ("err" in user) return res.status(401).send({err:user.err});
@@ -27,16 +26,15 @@ const login = async (req:CustomRequest,res:Response,next:NextFunction) => {
         req.user = user.data;
         req.session.userId = user.data.id;
 
-        res.status(200).send({data:user.data});
+        res.status(200).send({data:user.data.id});
     } catch (err) {
-        res.status(500).send(err);
+        console.log(err);
+        res.status(500).send({ err: "Internal server error!" });
     }
 }
 
 const register = async (req:CustomRequest,res:Response,next:NextFunction) => {
     try{
-        if (req.user) return res.status(200).send({data:req.user});
-        
         const createUserData:ICreateUser = req.body;
         const user = await userService.register(createUserData);
         if ("err" in user) return res.status(400).send({err:user.err});
@@ -44,14 +42,27 @@ const register = async (req:CustomRequest,res:Response,next:NextFunction) => {
         req.user = user.data;
         req.session.userId = user.data.id;
 
-        res.status(200).send({data:user.data});
+        res.status(200).send({data:user.data.id});
     } catch (err) {
-        res.status(500).send(err);
+        console.log(err);
+        res.status(500).send({ err: "Internal server error!" });
+    }
+}
+
+const validateAuth = async (req: CustomRequest, res: Response ) => {
+    try {
+        if (req.session.userId) return res.status(200).send({data:req.session.userId});
+        else res.status(200).send({err: "User not logged in!"});
+
+    } catch(err) {
+        console.log(err);
+        res.status(500).send({err:"Internal server error!"})
     }
 }
 
 export default {
     getUserByEmail, 
     login,
-    register
+    register,
+    validateAuth
 };

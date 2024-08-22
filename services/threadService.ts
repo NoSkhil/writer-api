@@ -11,7 +11,7 @@ const getThread = async (id: string): Promise<Record<"data", IThread> | Record<"
     }
     catch (err) {
         console.log(err);
-        return err;
+        throw err;
     }
 };
 
