@@ -1,5 +1,6 @@
 import userService from "../services/userService";
 import {Request, Response, NextFunction} from "express";
+import { CustomRequest } from '../types/requestTypes';
 import { ICreateUser } from "../types/userTypes";
 
 
@@ -15,11 +16,16 @@ const getUserByEmail = async (req:Request,res:Response,next:NextFunction) => {
     }
 }
 
-const login = async (req:Request,res:Response,next:NextFunction) => {
+const login = async (req:CustomRequest,res:Response,next:NextFunction) => {
     try{
+        if (req.user) return res.status(200).send({data:req.user});
+
         const {email,password} = req.body;
         const user = await userService.login({email,password});
-        if ("err" in user) return res.status(301).send({err:user.err});
+        if ("err" in user) return res.status(401).send({err:user.err});
+
+        req.user = user.data;
+        req.session.userId = user.data.id;
 
         res.status(200).send({data:user.data});
     } catch (err) {
@@ -27,11 +33,16 @@ const login = async (req:Request,res:Response,next:NextFunction) => {
     }
 }
 
-const register = async (req:Request,res:Response,next:NextFunction) => {
+const register = async (req:CustomRequest,res:Response,next:NextFunction) => {
     try{
+        if (req.user) return res.status(200).send({data:req.user});
+        
         const createUserData:ICreateUser = req.body;
         const user = await userService.register(createUserData);
-        if ("err" in user) return res.status(301).send({err:user.err});
+        if ("err" in user) return res.status(400).send({err:user.err});
+
+        req.user = user.data;
+        req.session.userId = user.data.id;
 
         res.status(200).send({data:user.data});
     } catch (err) {

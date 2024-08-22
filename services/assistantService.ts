@@ -105,6 +105,7 @@ const runAssistant = async ({ threadId, userId }: {
     }
 }
 
+// RUN A CHEAPER MODEL FOR NON_LOGGED_IN USERS
 const runTempAssistant = async ({ threadId, tempUserId }: {
     threadId: string;
     tempUserId: string;

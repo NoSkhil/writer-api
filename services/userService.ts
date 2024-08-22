@@ -33,7 +33,7 @@ const login = async ({email, password}:{
     password:string;
 }): Promise<Record<"data", IUser> | Record<"err", string>> => {
     try {
-        const user = await db.users.findFirst({where:{email}});
+        const user = await db.users.findUnique({where:{email}});
         if (!user) return { err: "Invalid Credentials" };
 
         const verify = await argon2.verify(user.password, password);
@@ -49,7 +49,7 @@ const login = async ({email, password}:{
 
 const register = async (user: ICreateUser): Promise<Record<"data", IUser> | Record<"err", string>> => {
     try {
-        const existingUser = await db.users.findFirst({where:{email: user.email}});
+        const existingUser = await db.users.findUnique({where:{email: user.email}});
         if (existingUser) return { err: "User already exists" };
 
         const hashedPassword = await argon2.hash(user.password);

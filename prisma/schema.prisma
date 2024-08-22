@@ -13,8 +13,8 @@ model users {
   first_name          String
   last_name           String
   password            String
-  email               String
-  phone_number        String?
+  email               String      @unique
+  phone_number        String?     @unique
   country             String?
   profile_picture_url String?
   user_options        Json @default("{}")
