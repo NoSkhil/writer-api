@@ -4,7 +4,7 @@ import { ICreateUser, IUser } from '../types/userTypes';
 
 const getUserById = async (id: string): Promise<Record<"data", IUser> | Record<"err", string>> => {
     try {
-        const user = await db.users.findFirst({where:{id}});
+        const user = await db.users.findUnique({where:{id},omit:{password:true}});
         if (!user) return { err: "Invalid User ID" };
 
         else return { data: user };
@@ -39,7 +39,9 @@ const login = async ({email, password}:{
         const verify = await argon2.verify(user.password, password);
         if (!verify) return { err: "Invalid credentials" };
 
-        else return { data: user };
+        const {password:removePassword, ...safeUserObject}:{password:string;} = user;
+        
+        return { data: safeUserObject as IUser };
     }
     catch (err) {
         console.log(err);
@@ -49,8 +51,9 @@ const login = async ({email, password}:{
 
 const register = async (user: ICreateUser): Promise<Record<"data", IUser> | Record<"err", string>> => {
     try {
-        const existingUser = await db.users.findUnique({where:{email: user.email}});
-        if (existingUser) return { err: "User already exists" };
+        const existingEmail = await db.users.findUnique({where:{email: user.email}});
+        const existingPhoneNumber = user.phone_number && await db.users.findUnique({where:{phone_number: user.phone_number}});
+        if (existingEmail || existingPhoneNumber) return { err: "User already exists" };
 
         const hashedPassword = await argon2.hash(user.password);
         user.password = hashedPassword;

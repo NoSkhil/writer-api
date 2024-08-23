@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import type {users as IUser} from "@prisma/client";
+import { IUser } from './userTypes';
 declare module 'express-session' {
   interface SessionData {
     userId?: string;

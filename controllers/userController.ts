@@ -51,9 +51,9 @@ const register = async (req:CustomRequest,res:Response,next:NextFunction) => {
 
 const validateAuth = async (req: CustomRequest, res: Response ) => {
     try {
-        if (req.session.userId) return res.status(200).send({data:req.session.userId});
+        if (req.user) return res.status(200).send({data:req.user});
         
-        res.status(200).send({err: "User not logged in!"});
+        res.status(401).send({err: "Unauthorised User!"});
     } catch(err) {
         console.log(err);
         res.status(500).send({err:"Internal server error!"})
