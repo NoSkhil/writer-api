@@ -17,7 +17,7 @@ const getUserById = async (id: string): Promise<Record<"data", IUser> | Record<"
 
 const getUserByEmail = async (email: string): Promise<Record<"data", IUser> | Record<"err", string>> => {
     try {
-        const user = await db.users.findFirst({where:{email}});
+        const user = await db.users.findUnique({where:{email}});
         if (!user) return { err: "Invalid User ID" };
 
         else return { data: user };
