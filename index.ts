@@ -8,7 +8,11 @@ import { chatRoutes } from './routes/chatRoutes';
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173', // Your frontend URL
+    credentials: true,
+  }));
+//app.use(cors());
 app.use(express.json());
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key',

@@ -2,6 +2,9 @@ import { Response } from "express";
 import { CustomRequest } from '../types/requestTypes';
 import tempChatService from "../services/tempChatService";
 import chatService from "../services/chatService";
+import path from "path";
+import fs from "fs";
+import { send } from "process";
 
 const initialiseChat = async (req: CustomRequest, res: Response) => {
     try {
@@ -49,7 +52,32 @@ const createMessage = async (req: CustomRequest, res: Response) => {
     }
 };
 
+const sendAudioFile = async (req: CustomRequest, res: Response) => {
+    try {
+        const { filename } = req.params;
+        const audioPath = path.join(__dirname, '..', 'audio', filename);
+
+        // Check if the file exists
+        if (!fs.existsSync(audioPath)) {
+            return res.status(404).send({ error: "Audio file not found" });
+        }
+
+        // Set the appropriate headers
+        res.setHeader('Content-Type', 'audio/mpeg');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+        // Stream the file to the response
+        const fileStream = fs.createReadStream(audioPath);
+        fileStream.pipe(res);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send({ error: "Internal server error!" });
+    }
+};
+
 export default {
     initialiseChat,
-    createMessage
+    createMessage,
+    sendAudioFile
 };
