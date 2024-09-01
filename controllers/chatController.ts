@@ -4,7 +4,6 @@ import tempChatService from "../services/tempChatService";
 import chatService from "../services/chatService";
 import path from "path";
 import fs from "fs";
-import { send } from "process";
 
 const initialiseChat = async (req: CustomRequest, res: Response) => {
     try {

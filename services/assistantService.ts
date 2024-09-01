@@ -149,7 +149,7 @@ const pollAssistantRunStatus = async ({ threadId, runId }: {
     //CHECK OPENAI API REF THERE MUST BE A CALLBACK ON COMPLETION, REMOVE THIS SHIT ASAP
     try {
         // Max Retry Limit, make it an enum.
-        let maxRetries = 5;
+        let maxRetries = 15;
         let retryCount = 0;
 
         while (true) {
