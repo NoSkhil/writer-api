@@ -2,7 +2,7 @@ import threadService from "../services/threadService";
 import { Request, Response, NextFunction } from "express";
 
 
-const getThread = async (req: Request, res: Response, next: NextFunction) => {
+const getThread = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const threadData = await threadService.getThread(id);

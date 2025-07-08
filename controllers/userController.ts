@@ -4,7 +4,7 @@ import { CustomRequest } from '../types/requestTypes';
 import { ICreateUser } from "../types/userTypes";
 
 
-const getUserByEmail = async (req: Request, res: Response, next: NextFunction) => {
+const getUserByEmail = async (req: Request, res: Response) => {
     try {
         const { email } = req.body;
         const user = await userService.getUserByEmail(email);
@@ -16,7 +16,7 @@ const getUserByEmail = async (req: Request, res: Response, next: NextFunction) =
     }
 }
 
-const login = async (req: CustomRequest, res: Response, next: NextFunction) => {
+const login = async (req: CustomRequest, res: Response) => {
     try {
         const { email, password } = req.body;
         const user = await userService.login({ email, password });
@@ -31,7 +31,7 @@ const login = async (req: CustomRequest, res: Response, next: NextFunction) => {
     }
 }
 
-const register = async (req: CustomRequest, res: Response, next: NextFunction) => {
+const register = async (req: CustomRequest, res: Response) => {
     try {
         const createUserData: ICreateUser = req.body;
         const user = await userService.register(createUserData);
