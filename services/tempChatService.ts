@@ -1,16 +1,14 @@
 import tempThreadService from "./tempThreadService";
 import tempMessageService from "./tempMessageService";
 import assistantService from "./assistantService";
-import ttsService from "./ttsService";
 import { ITempThread, ICreateTempThread } from "../types/threadTypes";
 import { ICreateTempMessage, ITempMessage } from "../types/messageTypes";
 import { ICreateAssistantMessage } from "../types/openaiTypes";
 import { CHAT_ROLE } from "../types/chatRoleTypes";
 
-const initialiseTempChat = async (userId: string): Promise<Record<"data", ITempThread> | Record<"err", string>> => {
+const initialiseTempChat = async (userId: string): Promise<ITempThread> => {
     try {
-        const initialiseAssistantThread = await assistantService.createAssistantThread();
-        const openaiThreadData = initialiseAssistantThread.data;
+        const openaiThreadData = await assistantService.createAssistantThread();
 
         const tempThreadData: ICreateTempThread = {
             id: openaiThreadData.id,
@@ -18,7 +16,7 @@ const initialiseTempChat = async (userId: string): Promise<Record<"data", ITempT
         }
         const initialiseTempThread = await tempThreadService.createThread(tempThreadData);
 
-        return { data: initialiseTempThread.data };
+        return initialiseTempThread;
     }
     catch (err) {
         console.log(err);
@@ -39,23 +37,21 @@ const createTempMessage = async ({ threadId, userId, content }: {
         const assistantMessage = await assistantService.createAssistantMessage({ threadId, messageData: assistantMessageData });
 
         let tempMessageData: ICreateTempMessage = {
-            id: assistantMessage.data.id,
+            id: assistantMessage.id,
             role: CHAT_ROLE.USER,
             content: { text: content },
             temp_thread_id: threadId,
             temp_user: userId
         }
 
-        const tempMessage = await tempMessageService.createTempMessage(tempMessageData);
-        if ("err" in tempMessage) return { err: tempMessage.err };
+        const message = await tempMessageService.createTempMessage(tempMessageData);
 
-        const runAssistant = await assistantService.runTempAssistant({ threadId, tempUserId: userId });
-        if ("err" in runAssistant) return { err: runAssistant.err };
-        
+        const assistantResponse = await assistantService.runTempAssistant({ threadId, tempUserId: userId });
+
         return {
             data: {
-                message: tempMessage.data,
-                assistantResponse: runAssistant.data
+                message,
+                assistantResponse
             }
         };
     }

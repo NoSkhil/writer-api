@@ -9,12 +9,12 @@ import { IAssistantMessage, IAssistantThread, ICreateAssistantMessage, IAssistan
 import { ICreateMessage, ICreateTempMessage, ITempMessage, IMessage } from "../types/messageTypes";
 
 
-const getAssistantThread = async (id: string): Promise<Record<"data", IAssistantThread> | Record<"err", string>> => {
+const getAssistantThread = async (id: string): Promise<IAssistantThread> => {
     try {
         const thread = await openai.beta.threads.retrieve(id);
-        if (!thread) return { err: "Invalid Assistant Thread ID." };
+        if (!thread) throw new Error("Invalid OpenAI Thread ID");
 
-        return { data: thread };
+        return thread;
     }
     catch (err) {
         console.log(err);
@@ -22,10 +22,10 @@ const getAssistantThread = async (id: string): Promise<Record<"data", IAssistant
     }
 };
 
-const createAssistantThread = async (): Promise<Record<"data", IAssistantThread>> => {
+const createAssistantThread = async (): Promise<IAssistantThread> => {
     try {
         const createdThread = await openai.beta.threads.create();
-        return { data: createdThread };
+        return createdThread;
     }
     catch (err) {
         console.log(err);
@@ -33,10 +33,10 @@ const createAssistantThread = async (): Promise<Record<"data", IAssistantThread>
     }
 };
 
-const getAssistantMessage = async (threadId: string, messageId: string): Promise<Record<"data", IAssistantMessage>> => {
+const getAssistantMessage = async (threadId: string, messageId: string): Promise<IAssistantMessage> => {
     try {
         const thread = await openai.beta.threads.messages.retrieve(threadId, messageId);
-        return { data: thread };
+        return thread;
     }
     catch (err) {
         console.log(err);
@@ -47,10 +47,10 @@ const getAssistantMessage = async (threadId: string, messageId: string): Promise
 const createAssistantMessage = async ({ threadId, messageData }: {
     threadId: string;
     messageData: ICreateAssistantMessage
-}): Promise<Record<"data", IAssistantMessage>> => {
+}): Promise<IAssistantMessage> => {
     try {
         const createMessage = await openai.beta.threads.messages.create(threadId, messageData);
-        return { data: createMessage };
+        return createMessage;
     }
     catch (err) {
         console.log(err);
@@ -58,10 +58,10 @@ const createAssistantMessage = async ({ threadId, messageData }: {
     }
 }
 
-const fetchLatestMessage = async (threadId: string): Promise<Record<"data", IAssistantMessage>> => {
+const fetchLatestMessage = async (threadId: string): Promise<IAssistantMessage> => {
     try {
         const response = await openai.beta.threads.messages.list(threadId, { limit: 1 });
-        return { data: response.data[0] };
+        return response.data[0];
     }
     catch (err) {
         console.log(err);
@@ -72,32 +72,27 @@ const fetchLatestMessage = async (threadId: string): Promise<Record<"data", IAss
 const runAssistant = async ({ threadId, userId }: {
     threadId: string;
     userId: string;
-}): Promise<Record<"data", IMessage> | Record<"err", string>> => {
+}): Promise<IMessage> => {
     try {
         let run = await openai.beta.threads.runs.create(threadId, { assistant_id: process.env.OPENAI_ASSISTANT_ID as string });
 
         const fetchCompletedRun = await pollAssistantRunStatus({ threadId, runId: run.id });
-        if ("err" in fetchCompletedRun) return { err: fetchCompletedRun.err };
-
-        run = fetchCompletedRun.data;
+        run = fetchCompletedRun;
 
         const assistantResponse = await fetchLatestMessage(run.thread_id);
-        if ("err" in assistantResponse) return { err: "Failed to fetch assistant response" };
-        if (assistantResponse.data.content[0].type !== "text") return { err: "Invalid Assistant response!" };
+        if (assistantResponse.content[0].type !== "text") throw new Error("Invalid Assistant response!");
 
-        const responseContent: { script: string; voice: string } = JSON.parse(assistantResponse.data.content[0].text.value);
+        const responseContent: { script: string; voice: string } = JSON.parse(assistantResponse.content[0].text.value);
         const messageData: ICreateMessage = {
             user_id: userId,
-            id: assistantResponse.data.id,
-            role: assistantResponse.data.role,
+            id: assistantResponse.id,
+            role: assistantResponse.role,
             content: responseContent,
             thread_id: run.thread_id
         }
 
         const savedResponse = await messageService.createMessage(messageData);
-        if ("err" in savedResponse) return { err: savedResponse.err };
-
-        return { data: savedResponse.data };
+        return savedResponse;
     }
     catch (err) {
         console.log(err);
@@ -109,32 +104,26 @@ const runAssistant = async ({ threadId, userId }: {
 const runTempAssistant = async ({ threadId, tempUserId }: {
     threadId: string;
     tempUserId: string;
-}): Promise<Record<"data", ITempMessage> | Record<"err", string>> => {
+}): Promise<ITempMessage> => {
     try {
         let run = await openai.beta.threads.runs.create(threadId, { assistant_id: process.env.OPENAI_ASSISTANT_ID as string });
 
         const fetchCompletedRun = await pollAssistantRunStatus({ threadId, runId: run.id });
-        if ("err" in fetchCompletedRun) return { err: fetchCompletedRun.err };
-
-        run = fetchCompletedRun.data;
+        run = fetchCompletedRun;
 
         const assistantResponse = await fetchLatestMessage(run.thread_id);
-        if ("err" in assistantResponse) return { err: "Failed to fetch assistant response" };
+        if (assistantResponse.content[0].type !== "text") throw new Error("Invalid Assistant response!");
 
-        if (assistantResponse.data.content[0].type !== "text") return { err: "Invalid Assistant response!" };
-
-        const responseContent: { script: string; voice: string } = JSON.parse(assistantResponse.data.content[0].text.value);
+        const responseContent: { script: string; voice: string } = JSON.parse(assistantResponse.content[0].text.value);
         const messageData: ICreateTempMessage = {
             temp_user: tempUserId,
-            id: assistantResponse.data.id,
-            role: assistantResponse.data.role,
+            id: assistantResponse.id,
+            role: assistantResponse.role,
             content: responseContent,
             temp_thread_id: run.thread_id
         }
         const savedResponse = await tempMessageService.createTempMessage(messageData);
-        if ("err" in savedResponse) return { err: savedResponse.err };
-
-        return { data: savedResponse.data };
+        return savedResponse;
     }
     catch (err) {
         console.log(err);
@@ -145,8 +134,8 @@ const runTempAssistant = async ({ threadId, tempUserId }: {
 const pollAssistantRunStatus = async ({ threadId, runId }: {
     threadId: string;
     runId: string;
-}): Promise<Record<"data", IAssistantRun> | Record<"err", string>> => {
-    //CHECK OPENAI API REF THERE MUST BE A CALLBACK ON COMPLETION, REMOVE THIS SHIT ASAP
+}): Promise<IAssistantRun> => {
+    //CHECK OPENAI API DOCS THERE IS AN EVENT FLAG ON COMPLETION, REMOVE THIS SHIT ASAP
     try {
         // Max Retry Limit, make it an enum.
         let maxRetries = 15;
@@ -161,13 +150,13 @@ const pollAssistantRunStatus = async ({ threadId, runId }: {
             console.log(`Polling status: ${run.status}`);
 
             if (run.status === "completed") {
-                return { data: run };
+                return run;
             }
 
             // Increment the retry count and check if we've exceeded the maximum
             retryCount++;
             if (retryCount > maxRetries) {
-                return { err: "Failed to fetch Assistant response! - Maximum number of retries exceeded." };
+                throw new Error("Failed to fetch Assistant response! - Maximum number of retries exceeded.");
             }
         }
     } catch (err) {

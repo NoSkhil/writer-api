@@ -9,33 +9,29 @@ const initialiseChat = async (req: CustomRequest, res: Response) => {
     try {
         if (req.session.userId) {
             const thread = await chatService.initialiseChat(req.session.userId);
-            if ("err" in thread) res.status(400).send(thread.err);
-
-            else res.status(200).send(thread.data);
+            res.status(200).send(thread);
         }
-        
+
         else if (req.session.tempUserId) {
             const thread = await tempChatService.initialiseTempChat(req.session.tempUserId);
-            if ("err" in thread) res.status(400).send(thread.err);
-
-            else res.status(200).send(thread.data);
+            res.status(200).send(thread);
         }
     }
     catch (err) {
         console.log(err);
-        res.status(500).send({ err: "Internal server error!" });
+        res.status(500).send(err);
     }
 };
 
 const createMessage = async (req: CustomRequest, res: Response) => {
     try {
-        const { threadId, content } : {threadId:string;content:string;} = req.body;
+        const { threadId, content }: { threadId: string; content: string; } = req.body;
 
         if (req.user) {
             const messages = await chatService.createMessage({ threadId, content, user: req.user });
             if ("err" in messages) res.status(400).send(messages.err);
 
-            else res.status(200).send(messages.data);
+            else res.status(200).send(messages);
         }
 
         else if (req.session.tempUserId) {
@@ -47,7 +43,7 @@ const createMessage = async (req: CustomRequest, res: Response) => {
     }
     catch (err) {
         console.log(err);
-        res.status(500).send({ err: "Internal server error!" });
+        res.status(500).send(err);
     }
 };
 
@@ -65,7 +61,7 @@ const sendAudioFile = async (req: CustomRequest, res: Response) => {
         res.setHeader('Content-Type', 'audio/mpeg');
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 
-        // Stream the file to the response
+        // Stream the file to the client
         const fileStream = fs.createReadStream(audioPath);
         fileStream.pipe(res);
     }

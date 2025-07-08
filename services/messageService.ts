@@ -1,12 +1,12 @@
 import db from '../prisma/client';
 import { IMessage, ICreateMessage } from '../types/messageTypes';
 
-const getMessage = async (id: string): Promise<Record<"data", IMessage> | Record<"err", string>> => {
+const getMessage = async (id: string): Promise<IMessage> => {
     try {
         const message = await db.messages.findUnique({ where: { id } });
-        if (!message) return { err: "Invalid Message ID." };
+        if (!message) throw new Error("Invalid Message ID.");
 
-        else return { data: message };
+        else return message;
     }
     catch (err) {
         console.log(err);
@@ -14,13 +14,12 @@ const getMessage = async (id: string): Promise<Record<"data", IMessage> | Record
     }
 };
 
-const createMessage = async (messageData: ICreateMessage): Promise<Record<"data", IMessage> | Record<"err", string>> => {
+const createMessage = async (messageData: ICreateMessage): Promise<IMessage> => {
     try {
         const thread = await db.threads.findUnique({ where: { id: messageData.thread_id } });
-        if (!thread) return { err: "Invalid Thread ID." };
+        if (!thread) throw new Error("Invalid Thread ID.");
 
-        const createdMessage = await db.messages.create({ data: messageData });
-        return { data: createdMessage };
+        return await db.messages.create({ data: messageData });;
     }
     catch (err) {
         console.log(err);
