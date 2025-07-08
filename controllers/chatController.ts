@@ -67,7 +67,7 @@ const sendAudioFile = async (req: CustomRequest, res: Response) => {
     }
     catch (err) {
         console.error(err);
-        res.status(500).send({ error: "Internal server error!" });
+        res.status(500).send(err);
     }
 };
 
