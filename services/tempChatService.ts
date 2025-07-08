@@ -28,7 +28,7 @@ const createTempMessage = async ({ threadId, userId, content }: {
     threadId: string;
     content: string;
     userId: string;
-}): Promise<Record<"data", { message: ITempMessage; assistantResponse: ITempMessage }> | Record<"err", string>> => {
+}): Promise<{ message: ITempMessage; assistantResponse: ITempMessage }> => {
     try {
         let assistantMessageData: ICreateAssistantMessage = {
             content,
@@ -49,10 +49,8 @@ const createTempMessage = async ({ threadId, userId, content }: {
         const assistantResponse = await assistantService.runTempAssistant({ threadId, tempUserId: userId });
 
         return {
-            data: {
                 message,
                 assistantResponse
-            }
         };
     }
     catch (err) {

@@ -38,7 +38,7 @@ const createMessage = async (req: CustomRequest, res: Response) => {
             const messages = await tempChatService.createTempMessage({ threadId, content, userId: req.session.tempUserId });
             if ("err" in messages) res.status(400).send(messages.err);
 
-            else res.status(200).send(messages.data);
+            else res.status(200).send(messages);
         }
     }
     catch (err) {
