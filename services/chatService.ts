@@ -51,8 +51,7 @@ const createMessage = async ({ threadId, user, content }: {
 
     const assistantResponse = await assistantService.runAssistant({ threadId, userId: user.id });
 
-    let audioAdFile: string | null = null;
-    audioAdFile = await generateInstantAudioAd(user, assistantResponse);
+    const audioAdFile = await generateInstantAudioAd(user, assistantResponse);
 
     return {
       message,
